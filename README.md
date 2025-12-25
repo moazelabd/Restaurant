@@ -1,27 +1,47 @@
-CIE205 - Data Structures Project (2025)
--------- Zewail City --------
-🍽️ Data Structure Project
-This project is made for the CIE205 - Data Structures and Algorithms course.
-It demonstrates the use of Object-Oriented Programming (OOP) and Data Structures in C++.
+# 🍽️ Restaurant Management System
 
-📘 Description
-The project simulates a Restaurant Management System using classes, templates, and data structures.
-It manages customers, orders, and menu items efficiently using linked lists and queues.
+**Course:** CIE205 - Data Structures and Algorithms (2025)  
+**Institution:** Zewail City of Science and Technology  
 
-🧩 Features
-Add / remove customers
-Add / serve orders
-Display waiting list
-Uses OOP and templates
-Console-based interface
-🛠️ Technologies
-Language: C++
-IDE: Visual Studio
-Concepts Used: Classes, Templates, Linked Lists, Queues, OOP
-👥 Team Members
-Leader: Moaz Elabd
-Team Member 1: Mamdouh Nazmy
-Team Member 2: Mohamed Ashraf
-🏫 Institution
-Zewail City of Science and Technology
-CIE205 - Data Structures Project (2025)
+---
+
+## 📘 Description
+This project simulates a **Restaurant Management System** using **C++**.  
+It demonstrates the use of **Object-Oriented Programming (OOP)** and **Data Structures** to manage customers, orders, and menu items efficiently.
+
+The system uses **linked lists** and **queues** to manage the waiting list and orders.
+
+---
+
+## 🧩 Features
+- Add / remove customers
+- Add / serve orders
+- Display waiting list
+- Utilizes **OOP** and **templates**
+- Console-based interface
+
+---
+
+## 🛠️ Technologies
+- **Language:** C++
+- **IDE:** Visual Studio
+- **Concepts Used:** Classes, Templates, Linked Lists, Queues, Object-Oriented Programming (OOP)
+
+---
+
+## 👥 Team Members
+- **Leader:** Moaz Elabd  
+- **Team Member 1:** Mamdouh Nazmy  
+- **Team Member 2:** Mohamed Ashraf  
+
+---
+
+## 📌 How to Run
+1. Open the project in **Visual Studio**.
+2. Build the solution.
+3. Run the executable in the console.
+4. Follow the menu prompts to add customers, manage orders, and display the waiting list.
+
+---
+
+**Enjoy managing your restaurant efficiently! 🍽️**

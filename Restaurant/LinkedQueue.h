@@ -15,6 +15,20 @@ private:
 	int count;
 public:
 	LinkedQueue();
+    LinkedQueue& operator=(LinkedQueue& other);
+    // Transfer ownership of nodes from other to this
+    void moveFrom(LinkedQueue<T>& other) {
+        // clear current
+        T tmp;
+        while (dequeue(tmp));
+        // steal
+        frontPtr = other.frontPtr;
+        backPtr = other.backPtr;
+        count = other.count;
+        other.frontPtr = nullptr;
+        other.backPtr = nullptr;
+        other.count = 0;
+    }
 	bool isEmpty() const;
 	bool enqueue(const T& newEntry);
 	bool dequeue(T& frntEntry);
@@ -85,6 +99,24 @@ LinkedQueue<T>::LinkedQueue()
 	backPtr = nullptr;
 	frontPtr = nullptr;
 	count = 0;
+}
+
+// Move-assignment: transfer ownership from other to this
+template <typename T>
+LinkedQueue<T>& LinkedQueue<T>::operator=(LinkedQueue<T>& other)
+{
+    if (this == &other) return *this;
+    // clear current
+    T tmp;
+    while (dequeue(tmp));
+    // steal pointers
+    frontPtr = other.frontPtr;
+    backPtr = other.backPtr;
+    count = other.count;
+    other.frontPtr = nullptr;
+    other.backPtr = nullptr;
+    other.count = 0;
+    return *this;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

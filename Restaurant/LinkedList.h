@@ -13,6 +13,28 @@ private:
 public:
     LinkedList() : Head(nullptr), count(0) {}
 
+    // Move-assignment: transfer ownership from other to this
+    LinkedList<T>& operator=(LinkedList<T>& other) {
+        if (this == &other) return *this;
+        // clear current
+        T tmp;
+        while (DeleteFirst(tmp));
+        // steal pointers
+        Head = other.Head;
+        count = other.count;
+        other.Head = nullptr;
+        other.count = 0;
+        return *this;
+    }
+    void moveFrom(LinkedList<T>& other) {
+        T tmp;
+        while (DeleteFirst(tmp));
+        Head = other.Head;
+        count = other.count;
+        other.Head = nullptr;
+        other.count = 0;
+    }
+
     ~LinkedList() {
         clear();
     }

@@ -12,6 +12,7 @@ order class
 Order::Order() : type(NORMAL), OrderSize(0), OrderPrice(0.0), ID(0),
 ArraivalTime(0.0), waitingTime(0.0), serviceTime(0.0),
 finishTime(0.0), Status(waiting) {
+    remainingSize = 0;
 }
 
 
@@ -21,7 +22,7 @@ Order::~Order() {}
 // Setters
 void Order::setArrivalTime(double t) { ArraivalTime = t; }
 void Order::setOrderType(OrderType t) { type = t; }
-void Order::setOrderSize(int size) { OrderSize = size; }
+void Order::setOrderSize(int size) { OrderSize = size; remainingSize = size; }
 void Order::setOrderPrice(double price) { OrderPrice = price; }
 void Order::setID(int id) { ID = id; }
 void Order::setWaitingTime(double wt) { waitingTime = wt; }

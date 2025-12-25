@@ -109,6 +109,27 @@ public:
         return true;
     }
 
+    // Move-assignment to transfer node ownership
+    PriorityQueue<T>& operator=(PriorityQueue<T>& other) {
+        if (this == &other) return *this;
+        // clear current
+        T tmp;
+        while (dequeue(tmp));
+        front = other.front;
+        count = other.count;
+        other.front = nullptr;
+        other.count = 0;
+        return *this;
+    }
+    void moveFrom(PriorityQueue<T>& other) {
+        T tmp;
+        while (dequeue(tmp));
+        front = other.front;
+        count = other.count;
+        other.front = nullptr;
+        other.count = 0;
+    }
+
     void clear() {
         T x;
         while (dequeue(x));

@@ -1,10 +1,19 @@
 #include "GUI.h"
+#include <crtdbg.h>
 
 GUI::GUI()
 {
     DrawingItemsCount = 0;
-    pWind = new window(WindWidth + 15, WindHeight, 0, 0);
-    pWind->ChangeTitle("The Restaurant");
+    for (int i = 0; i < maxItemCnt; ++i) DrawingList[i] = nullptr;
+    pWind = nullptr;
+    try {
+        pWind = new window(WindWidth + 15, WindHeight, 0, 0);
+        pWind->ChangeTitle("The Restaurant");
+    }
+    catch (...) {
+        // graphics not available; keep pWind == nullptr and operate in silent/console mode
+        pWind = nullptr;
+    }
 
     // set color for each order type (NORMAL, VEGAN, VIP)
     DrawingColors[0] = RED;       // NORMAL
@@ -18,13 +27,19 @@ GUI::GUI()
 
 GUI::~GUI()
 {
-    delete pWind;
+    if (pWind) {
+        // protect against deleting an invalid heap pointer (can happen when mixing CRTs)
+        if (_CrtIsValidHeapPointer((const void*)pWind))
+            delete pWind;
+        pWind = nullptr;
+    }
 }
 
 // ================= INPUT =================
 
 void GUI::waitForClick() const
 {
+    if (!pWind) return;
     int x, y;
     pWind->WaitMouseClick(x, y);
 }
@@ -35,6 +50,7 @@ string GUI::GetString() const
     char Key;
     while (1)
     {
+        if (!pWind) return string();
         pWind->WaitKeyPress(Key);
         if (Key == 27)          // ESC
             return "";
@@ -53,6 +69,12 @@ string GUI::GetString() const
 
 void GUI::PrintMessage(string msg) const
 {
+    if (!pWind) {
+        // fallback to console
+        cout << msg << endl;
+        return;
+    }
+
     ClearStatusBar();
 
     pWind->SetPen(DARKRED);
@@ -62,6 +84,7 @@ void GUI::PrintMessage(string msg) const
 
 void GUI::DrawString(const int iX, const int iY, const string Text)
 {
+    if (!pWind) return;
     pWind->SetPen(DARKRED);
     pWind->SetFont(18, BOLD, BY_NAME, "Arial");
     pWind->DrawString(iX, iY, Text);
@@ -69,6 +92,7 @@ void GUI::DrawString(const int iX, const int iY, const string Text)
 
 void GUI::ClearStatusBar() const
 {
+    if (!pWind) return;
     pWind->SetPen(WHITE, 3);
     pWind->SetBrush(WHITE);
     pWind->DrawRectangle(0, WindHeight - StatusBarHeight, WindWidth, WindHeight);
@@ -79,6 +103,7 @@ void GUI::ClearStatusBar() const
 
 void GUI::ClearDrawingArea() const
 {
+    if (!pWind) return;
     pWind->SetPen(KHAKI, 3);
     pWind->SetBrush(KHAKI);
     pWind->DrawRectangle(0, MenuBarHeight, WindWidth, WindHeight - StatusBarHeight);
@@ -86,6 +111,7 @@ void GUI::ClearDrawingArea() const
 
 void GUI::DrawRestArea() const
 {
+    if (!pWind) return;
     int L = RestWidth / 2;
 
     // 1- brown square
@@ -172,6 +198,8 @@ void GUI::DrawAllItems()
     for (int i = 0; i < DrawingItemsCount; i++)
     {
         DrawingItem* pDitem = DrawingList[i];
+        if (!pDitem) continue;
+        if (pDitem->region < 0 || pDitem->region >= REG_CNT) continue;
         RegionsCounts[pDitem->region]++;
         DrawSingleItem(pDitem, RegionsCounts[pDitem->region]);
     }
@@ -179,6 +207,7 @@ void GUI::DrawAllItems()
 
 void GUI::UpdateInterface()
 {
+    if (!pWind) return;
     ClearDrawingArea();
     DrawRestArea();
     DrawAllItems();
@@ -188,12 +217,15 @@ void GUI::UpdateInterface()
 void GUI::AddToDrawingList(Order* pOrd)
 {
     if (!pOrd) return;
+    if (DrawingItemsCount >= maxItemCnt) return;
 
     DrawingItem* pDitem = new DrawingItem;
     pDitem->ID = pOrd->getID();
 
     OrderType t = pOrd->getType();      // NORMAL, VEGAN, VIP
-    pDitem->clr = DrawingColors[(int)t];
+    int idx = static_cast<int>(t);
+    if (idx < 0 || idx > 2) idx = 0;
+    pDitem->clr = DrawingColors[idx];
 
     Orderstatus st = pOrd->getStatus();
     GUI_REGION reg = ORD_REG;
@@ -222,12 +254,14 @@ void GUI::AddToDrawingList(Order* pOrd)
 void GUI::AddToDrawingList(Cook* pC)
 {
     if (!pC) return;
+    if (DrawingItemsCount >= maxItemCnt) return;
 
     DrawingItem* pDitem = new DrawingItem;
     pDitem->ID = pC->getID();
 
-    OrderType t = pC->getSpecialization();
-    pDitem->clr = DrawingColors[(int)t];
+    int idx = static_cast<int>(pC->getSpecialization());
+    if (idx < 0 || idx > 2) idx = 0;
+    pDitem->clr = DrawingColors[idx];
     pDitem->region = COOK_REG;
 
     DrawingList[DrawingItemsCount++] = pDitem;
@@ -236,13 +270,28 @@ void GUI::AddToDrawingList(Cook* pC)
 void GUI::ResetDrawingList()
 {
     for (int i = 0; i < DrawingItemsCount; i++)
-        delete DrawingList[i];
+    {
+        if (DrawingList[i]) {
+            if (_CrtIsValidHeapPointer((const void*)DrawingList[i]))
+                delete DrawingList[i];
+            else {
+                // invalid pointer detected; avoid deleting it
+            }
+            DrawingList[i] = nullptr;
+        }
+    }
 
     DrawingItemsCount = 0;
 }
 
 PROG_MODE GUI::getGUIMode() const
 {
+    if (!pWind) {
+        // if graphics not available, default to silent mode
+        cout << "Graphics not available: running in silent mode.\n";
+        return MODE_SLNT;
+    }
+
     PROG_MODE Mode;
     do
     {

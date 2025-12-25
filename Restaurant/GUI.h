@@ -11,10 +11,10 @@ using namespace std;
 class GUI
 {
     enum GUI_REGION {
-        ORD_REG,
-        COOK_REG,
-        SRV_REG,
-        DONE_REG,
+        ORD_REG,   // waiting orders
+        COOK_REG,  // cooks
+        SRV_REG,   // in-service orders
+        DONE_REG,  // finished orders
         REG_CNT
     };
 
@@ -27,7 +27,7 @@ class GUI
 
 private:
     window* pWind;
-    color DrawingColors[3];
+    color DrawingColors[3];   // NORMAL, VEGAN, VIP
 
     static const int
         WindWidth = 1200, WindHeight = 650,
@@ -72,9 +72,11 @@ public:
     GUI();
     ~GUI();
 
+    // Input
     void waitForClick() const;
     string GetString() const;
 
+    // Output
     void PrintMessage(string msg) const;
 
     void UpdateInterface();

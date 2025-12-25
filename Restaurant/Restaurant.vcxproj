@@ -76,16 +76,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\cook.h" />
-    <ClInclude Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\enums.h" />
-    <ClInclude Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\event.h" />
-    <ClInclude Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\LinkedList.h" />
-    <ClInclude Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\LinkedQueue.h" />
-    <ClInclude Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\Node.h" />
-    <ClInclude Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\order.h" />
-    <ClInclude Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\priorty_queue.h" />
-    <ClInclude Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\QueueADT.h" />
-    <ClInclude Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\resturant.h" />
     <ClInclude Include="CMUgraphicsLib\CMUgraphics.h" />
     <ClInclude Include="CMUgraphicsLib\colors.h" />
     <ClInclude Include="CMUgraphicsLib\error.h" />
@@ -106,13 +96,15 @@
     <ClInclude Include="CMUgraphicsLib\version.h" />
     <ClInclude Include="CMUgraphicsLib\windowinput.h" />
     <ClInclude Include="GUI.h" />
+    <ClInclude Include="LinkedList.h" />
+    <ClInclude Include="LinkedQueue.h" />
+    <ClInclude Include="Node.h" />
+    <ClInclude Include="order.h" />
+    <ClInclude Include="priorty_queue.h" />
+    <ClInclude Include="QueueADT.h" />
+    <ClInclude Include="resturant.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\cook.cpp" />
-    <ClCompile Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\event.cpp" />
-    <ClCompile Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\main.cpp" />
-    <ClCompile Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\order.cpp" />
-    <ClCompile Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\resturant.cpp" />
     <ClCompile Include="CMUgraphicsLib\CMUgraphics.cpp" />
     <ClCompile Include="CMUgraphicsLib\colors.cpp" />
     <ClCompile Include="CMUgraphicsLib\image.cpp" />
@@ -148,12 +140,17 @@
     <ClCompile Include="CMUgraphicsLib\keyqueue.cpp" />
     <ClCompile Include="CMUgraphicsLib\mousequeue.cpp" />
     <ClCompile Include="CMUgraphicsLib\windowinput.cpp" />
+    <ClCompile Include="cook.cpp" />
+    <ClCompile Include="event.cpp" />
     <ClCompile Include="GUI.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="order.cpp" />
+    <ClCompile Include="resturant.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\test.txt" />
     <Text Include="CMUgraphicsLib\Manual.txt" />
     <Text Include="CMUgraphicsLib\Readme.txt" />
+    <Text Include="test.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,6 +1,5 @@
 #include "GUI.h"
 
-//////////////////////////////////////////////////////////////////////////////////////////
 GUI::GUI()
 {
     DrawingItemsCount = 0;
@@ -16,22 +15,20 @@ GUI::GUI()
     ClearDrawingArea();
     DrawRestArea();
 }
-//////////////////////////////////////////////////////////////////////////////////////////
+
 GUI::~GUI()
 {
     delete pWind;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////
-// ================================== INPUT FUNCTIONS ===================================
-//////////////////////////////////////////////////////////////////////////////////////////
+// ================= INPUT =================
 
 void GUI::waitForClick() const
 {
     int x, y;
     pWind->WaitMouseClick(x, y);
 }
-//////////////////////////////////////////////////////////////////////////////////////////
+
 string GUI::GetString() const
 {
     string Label;
@@ -52,9 +49,7 @@ string GUI::GetString() const
     }
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////
-// ================================== OUTPUT FUNCTIONS ==================================
-//////////////////////////////////////////////////////////////////////////////////////////
+// ================= OUTPUT =================
 
 void GUI::PrintMessage(string msg) const
 {
@@ -64,7 +59,7 @@ void GUI::PrintMessage(string msg) const
     pWind->SetFont(18, BOLD, BY_NAME, "Arial");
     pWind->DrawString(10, WindHeight - (int)(StatusBarHeight / 1.5), msg);
 }
-//////////////////////////////////////////////////////////////////////////////////////////
+
 void GUI::DrawString(const int iX, const int iY, const string Text)
 {
     pWind->SetPen(DARKRED);
@@ -72,7 +67,6 @@ void GUI::DrawString(const int iX, const int iY, const string Text)
     pWind->DrawString(iX, iY, Text);
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////
 void GUI::ClearStatusBar() const
 {
     pWind->SetPen(WHITE, 3);
@@ -82,14 +76,14 @@ void GUI::ClearStatusBar() const
     pWind->SetPen(BROWN, 3);
     pWind->DrawLine(0, WindHeight - StatusBarHeight, WindWidth, WindHeight - StatusBarHeight);
 }
-///////////////////////////////////////////////////////////////////////////////////
+
 void GUI::ClearDrawingArea() const
 {
     pWind->SetPen(KHAKI, 3);
     pWind->SetBrush(KHAKI);
     pWind->DrawRectangle(0, MenuBarHeight, WindWidth, WindHeight - StatusBarHeight);
 }
-///////////////////////////////////////////////////////////////////////////////////
+
 void GUI::DrawRestArea() const
 {
     int L = RestWidth / 2;
@@ -120,7 +114,6 @@ void GUI::DrawRestArea() const
     pWind->DrawString(RestStartX + (int)(0.1 * L), YHalfDrawingArea + 5 * L / 12, "DONE");
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////
 // draw ONE item
 void GUI::DrawSingleItem(const DrawingItem* pDitem, int RegionCount) const
 {
@@ -172,7 +165,6 @@ void GUI::DrawSingleItem(const DrawingItem* pDitem, int RegionCount) const
     pWind->DrawInteger(x, y, pDitem->ID);
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////
 void GUI::DrawAllItems()
 {
     int RegionsCounts[REG_CNT] = { 0 };
@@ -192,7 +184,6 @@ void GUI::UpdateInterface()
     DrawAllItems();
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////
 // add order to drawing list
 void GUI::AddToDrawingList(Order* pOrd)
 {
@@ -227,7 +218,6 @@ void GUI::AddToDrawingList(Order* pOrd)
     DrawingList[DrawingItemsCount++] = pDitem;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////
 // add cook to drawing list
 void GUI::AddToDrawingList(Cook* pC)
 {
@@ -243,8 +233,6 @@ void GUI::AddToDrawingList(Cook* pC)
     DrawingList[DrawingItemsCount++] = pDitem;
 }
 
-
-//////////////////////////////////////////////////////////////////////////////////////////
 void GUI::ResetDrawingList()
 {
     for (int i = 0; i < DrawingItemsCount; i++)
@@ -253,7 +241,6 @@ void GUI::ResetDrawingList()
     DrawingItemsCount = 0;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////
 PROG_MODE GUI::getGUIMode() const
 {
     PROG_MODE Mode;
@@ -267,4 +254,3 @@ PROG_MODE GUI::getGUIMode() const
 
     return Mode;
 }
-

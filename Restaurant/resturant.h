@@ -1,36 +1,34 @@
 #ifndef RESTURANT_H
 #define RESTURANT_H
 
+#include <string>
+#include "enums.h"
 #include "cook.h"
 #include "order.h"
 #include "event.h"
-#include <string>
-#include "Linkedlist.h"
+#include "LinkedList.h"
 #include "LinkedQueue.h"
 #include "priorty_queue.h"
 
-//RESTURANT CLASS
+class GUI;   // forward declaration
+
 class Restaurant {
 private:
-    
-
-    // lists of cooks
+    // cooks lists
     LinkedList<Cook*> normalCooks;
     LinkedList<Cook*> veganCooks;
     LinkedList<Cook*> vipCooks;
-    //bouns
-    LinkedList<Cook*> familyCooks;   // for FAMILY orders 
-    LinkedList<Cook*> expressCooks;  // for EXPRESS orders
+    LinkedList<Cook*> familyCooks;
+    LinkedList<Cook*> expressCooks;
 
     // waiting orders
     LinkedQueue<Order*> normalOrders;
     LinkedQueue<Order*> veganOrders;
     PriorityQueue<Order*> vipOrders;
-	//bouns
-    LinkedQueue<Order*> familyOrders;  
-    LinkedQueue<Order*> expressOrders; 
+    LinkedQueue<Order*> familyOrders;
+    LinkedQueue<Order*> expressOrders;
 
-    // in_service and finished
+    // in-service and finished
     LinkedList<Order*> inServiceOrders;
     LinkedList<Order*> finishedOrders;
 
@@ -40,19 +38,26 @@ private:
     int AutoPromotionLimit;
     int CurrentTimeStep;
 
+    int totalNormalOrders;
+    int totalVeganOrders;
+    int totalVIPOrders;
+    int autoPromotedCount;
+
+    GUI* pGUI;
+    PROG_MODE mode;
+
 public:
     Restaurant();
-    void LoadFile(const string& filename);
+    void setGUI(GUI* g, PROG_MODE m);
+    void LoadFile(const std::string& filename);
     void SimpleSimulator();
-	//full simulation
     void FullSimulator();
-    //bouns
+
     void insertCookSortedBySpeed(LinkedList<Cook*>& list, Cook* c);
     Cook* getFastestAvailableCook(LinkedList<Cook*>& list, OrderType orderType);
     double computeDeadline(Order* o);
-
-   void handleAutoPromotion();
-
+    void handleAutoPromotion();
+    void writeOutputFile(const std::string& outName);
 };
 
 #endif

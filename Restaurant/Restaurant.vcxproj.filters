@@ -76,38 +76,29 @@
     <ClInclude Include="CMUgraphicsLib\windowinput.h">
       <Filter>CMUGraphicsLib</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\cook.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\enums.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\event.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\LinkedList.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\LinkedQueue.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\Node.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\order.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\priorty_queue.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\QueueADT.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\resturant.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="GUI.h">
       <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="LinkedList.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="LinkedQueue.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Node.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="order.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="priorty_queue.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="QueueADT.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="resturant.h">
+      <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -216,23 +207,23 @@
     <ClCompile Include="CMUgraphicsLib\windowinput.cpp">
       <Filter>CMUGraphicsLib</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\cook.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\event.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\main.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\order.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\resturant.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
     <ClCompile Include="GUI.cpp">
       <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="cook.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="event.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="order.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="resturant.cpp">
+      <Filter>Resource Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -242,7 +233,7 @@
     <Text Include="CMUgraphicsLib\Readme.txt">
       <Filter>CMUGraphicsLib</Filter>
     </Text>
-    <Text Include="..\..\..\work\data structure\Data-Strucher-Project\Data-Strucher-Project\test.txt">
+    <Text Include="test.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>

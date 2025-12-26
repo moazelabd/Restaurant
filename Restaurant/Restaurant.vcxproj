@@ -95,6 +95,8 @@
     <ClInclude Include="CMUgraphicsLib\mousequeue.h" />
     <ClInclude Include="CMUgraphicsLib\version.h" />
     <ClInclude Include="CMUgraphicsLib\windowinput.h" />
+    <ClInclude Include="cook.h" />
+    <ClInclude Include="enums.h" />
     <ClInclude Include="GUI.h" />
     <ClInclude Include="LinkedList.h" />
     <ClInclude Include="LinkedQueue.h" />
@@ -150,7 +152,10 @@
   <ItemGroup>
     <Text Include="CMUgraphicsLib\Manual.txt" />
     <Text Include="CMUgraphicsLib\Readme.txt" />
+    <Text Include="output.txt" />
     <Text Include="test.txt" />
+    <Text Include="test2.txt" />
+    <Text Include="test3.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

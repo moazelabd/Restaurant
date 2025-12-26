@@ -25,6 +25,8 @@ private:
     int ordersSinceLastBreak;
     int ID;
 
+
+
 public:
     Cook();
     ~Cook();
@@ -45,6 +47,11 @@ public:
 	void setNextAvailableTime(int t);
 	void incrementOrdersSinceLastBreak();
     void setID(int id);
+    void applyFatigue();
+    void restoreSpeed();
+    void markInjured(int recoveryPeriod);
+    void skipNextBreak();
+    void resetOrdersSinceLastBreak();
 
     //getters
     OrderType getSpecialization() const;

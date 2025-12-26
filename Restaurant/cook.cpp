@@ -14,6 +14,9 @@ Cook::Cook()
     : specialization(NORMAL), baseSpeed(0), currentSpeed(0), ordersBeforeBreak(0), breakDuration(0),
     status(AVAILABLE), handledNormalOrders(0), handledVeganOrders(0), handledVIPOrders(0),
     busyTime(0), idleTime(0), breakTime(0), injuryTime(0) {
+    ordersSinceLastBreak = 0;
+    nextAvailableTime = 0;
+    ID = 0;
 }
 
 // Destructor
@@ -36,7 +39,16 @@ void Cook::setInjuryTime(int t) { injuryTime = t; }
 void Cook::setNextAvailableTime(int t) { nextAvailableTime = t; }
 void Cook::incrementOrdersSinceLastBreak() { ordersSinceLastBreak++; }
 void Cook::setID(int id) { ID = id; }
-
+void Cook::applyFatigue() {currentSpeed = max(1, (int)(currentSpeed * 0.95));}
+void Cook::restoreSpeed() {   currentSpeed = baseSpeed;}
+void Cook::markInjured(int recoveryPeriod) {
+    injuryTime += recoveryPeriod;
+    status = INJURED;
+}
+void Cook::skipNextBreak() {   ordersSinceLastBreak = 0; }
+void Cook::resetOrdersSinceLastBreak() {
+    ordersSinceLastBreak = 0;
+}
 
 // Getters
 OrderType Cook::getSpecialization() const { return specialization; }

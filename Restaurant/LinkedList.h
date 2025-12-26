@@ -152,6 +152,20 @@ public:
     }
     int GetCount() const { return count; }
 
+
+    void InsertAfter(Node<T>* prev, T item) {
+        if (prev == nullptr) {
+            InsertBeg(item);
+            return;
+        }
+
+        Node<T>* newNode = new Node<T>(item);
+
+        newNode->setNext(prev->getNext());
+        prev->setNext(newNode);
+    }
+
+
 };
 
 #endif

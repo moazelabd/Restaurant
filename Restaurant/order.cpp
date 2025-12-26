@@ -13,6 +13,7 @@ Order::Order() : type(NORMAL), OrderSize(0), OrderPrice(0.0), ID(0),
 ArraivalTime(0.0), waitingTime(0.0), serviceTime(0.0),
 finishTime(0.0), Status(waiting) {
     remainingSize = 0;
+    assignedCook = nullptr;
 }
 
 
@@ -32,6 +33,8 @@ void Order::setStatus(Orderstatus s) { Status = s; }
 void Order::setDeadline(double d) { deadline = d; }
 
 void Order::setRemainingSize(int size) { remainingSize = size; }
+void Order::setAssignedCook(Cook* c) { assignedCook = c; }
+
 
 // Getters
 double Order::getArraivalTime() const { return ArraivalTime; }
@@ -45,6 +48,7 @@ double Order::getFinishTime() const { return finishTime; }
 Orderstatus Order::getStatus() const { return Status; }
 double Order::getDeadline() const { return deadline; }
 int Order::getRemainingSize() const { return remainingSize; }
+Cook* Order::getAssignedCook() const { return assignedCook; }
 
 // Print order data
 void Order::print() const {

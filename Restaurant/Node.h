@@ -26,6 +26,9 @@ public:
     Node<T>* getNext() const {
         return next;
     }
+
+    void InsertAfter(Node<T>* prev, T item);
+
 };
 
 #endif

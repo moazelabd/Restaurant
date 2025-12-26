@@ -1,9 +1,11 @@
-﻿#include "resturant.h"     // أو "Restaurant.h" حسب اسم الفايل عندك
+﻿#include "resturant.h"     
 #include "GUI.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <windows.h>
+#include "LinkedList.h"
+#include <ctime>
 using namespace std;
 
 // ======================= Constructor & basic helpers =======================
@@ -14,7 +16,9 @@ Restaurant::Restaurant()
     totalVIPOrders(0), autoPromotedCount(0),
     pGUI(nullptr), mode(MODE_SLNT)
 {
+    srand((unsigned)time(nullptr));   
 }
+
 
 void Restaurant::setGUI(GUI* g, PROG_MODE m) {
     pGUI = g;
@@ -39,28 +43,37 @@ void Restaurant::LoadFile(const string& filename) {
         return;
     }
 
-    int normalID = 1, veganID = 1, vipID = 1;
-    int numNormal, numVIP, numVegan;
-    int speedNormal, speedVIP, speedVegan;
-    int ordersBeforeBreak, breakNormal, breakVIP, breakVegan;
+    // IDs for each cook type
+    int normalID = 1, veganID = 1, vipID = 1, familyID = 1, expressID = 1;
 
-    // 1) read num of cooks for every type  -> N G V
-    fin >> numNormal >> numVegan >> numVIP;
+    // numbers of cooks
+    int numNormal, numVIP, numVegan, numFamily, numExpress;
 
-    // 2) read speeds  -> SN SG SV
-    fin >> speedNormal >> speedVegan >> speedVIP;
+    // speeds
+    int speedNormal, speedVIP, speedVegan, speedFamily, speedExpress;
 
-    // 3) BO BN BG BV
-    fin >> ordersBeforeBreak >> breakNormal >> breakVegan >> breakVIP;
+    // break info
+    int ordersBeforeBreak;
+    int breakNormal, breakVIP, breakVegan, breakFamily, breakExpress;
 
-    // 4) read auto promotion limit -> AutoP
+    // 1) read number of cooks for each type: N G V F E
+    fin >> numNormal >> numVegan >> numVIP >> numFamily >> numExpress;
+
+    // 2) read speeds: SN SG SV SF SE
+    fin >> speedNormal >> speedVegan >> speedVIP >> speedFamily >> speedExpress;
+
+    // 3) read break info: BO BN BG BV BF BE
+    fin >> ordersBeforeBreak >> breakNormal >> breakVegan >> breakVIP >> breakFamily >> breakExpress;
+
+    // 4) read auto promotion limit
     fin >> AutoPromotionLimit;
 
-    // 5) num of events -> M
+    // 5) read number of events: M
     int numEvents;
     fin >> numEvents;
 
-    // -------- create cooks --------
+    // -------- create cooks (sorted by speed) --------
+
     // Normal cooks
     for (int i = 0; i < numNormal; ++i) {
         Cook* c = new Cook();
@@ -71,7 +84,8 @@ void Restaurant::LoadFile(const string& filename) {
         c->setOrdersBeforeBreak(ordersBeforeBreak);
         c->setBreakDuration(breakNormal);
         c->setNextAvailableTime(0);
-        normalCooks.InsertEnd(c);
+
+        insertCookSortedBySpeed(normalCooks, c);
     }
 
     // Vegan cooks
@@ -84,7 +98,8 @@ void Restaurant::LoadFile(const string& filename) {
         c->setOrdersBeforeBreak(ordersBeforeBreak);
         c->setBreakDuration(breakVegan);
         c->setNextAvailableTime(0);
-        veganCooks.InsertEnd(c);
+
+        insertCookSortedBySpeed(veganCooks, c);
     }
 
     // VIP cooks
@@ -97,7 +112,36 @@ void Restaurant::LoadFile(const string& filename) {
         c->setOrdersBeforeBreak(ordersBeforeBreak);
         c->setBreakDuration(breakVIP);
         c->setNextAvailableTime(0);
-        vipCooks.InsertEnd(c);
+
+        insertCookSortedBySpeed(vipCooks, c);
+    }
+
+    // Family cooks (new type)
+    for (int i = 0; i < numFamily; ++i) {
+        Cook* c = new Cook();
+        c->setID(familyID++);
+        c->setSpecialization(FAMILY);
+        c->setBaseSpeed(speedFamily);
+        c->setCurrentSpeed(speedFamily);
+        c->setOrdersBeforeBreak(ordersBeforeBreak);
+        c->setBreakDuration(breakFamily);
+        c->setNextAvailableTime(0);
+
+        insertCookSortedBySpeed(familyCooks, c);
+    }
+
+    // Express cooks (new type)
+    for (int i = 0; i < numExpress; ++i) {
+        Cook* c = new Cook();
+        c->setID(expressID++);
+        c->setSpecialization(EXPRESS);
+        c->setBaseSpeed(speedExpress);
+        c->setCurrentSpeed(speedExpress);
+        c->setOrdersBeforeBreak(ordersBeforeBreak);
+        c->setBreakDuration(breakExpress);
+        c->setNextAvailableTime(0);
+
+        insertCookSortedBySpeed(expressCooks, c);
     }
 
     // -------- read events --------
@@ -106,15 +150,18 @@ void Restaurant::LoadFile(const string& filename) {
         fin >> eventType;
 
         if (eventType == "R") {
+            // arrival event
             string orderType;
             int size, id, time;
             double price;
             fin >> orderType >> time >> id >> size >> price;
 
             Order* o = new Order();
-            if (orderType == "N")      o->setOrderType(NORMAL);
+            if (orderType == "N") o->setOrderType(NORMAL);
             else if (orderType == "V") o->setOrderType(VIP);
             else if (orderType == "G") o->setOrderType(VEGAN);
+            else if (orderType == "F") o->setOrderType(FAMILY);   // new
+            else if (orderType == "E") o->setOrderType(EXPRESS);  // new
 
             o->setOrderSize(size);
             o->setID(id);
@@ -125,12 +172,14 @@ void Restaurant::LoadFile(const string& filename) {
             events.enqueue(e);
         }
         else if (eventType == "X") {
+            // cancellation event
             int time, id;
             fin >> time >> id;
             Event* e = new Event(CANCELLATION, time, nullptr, id);
             events.enqueue(e);
         }
         else if (eventType == "P") {
+            // promotion event
             int time, id;
             double extraMoney;
             fin >> time >> id >> extraMoney;
@@ -143,6 +192,8 @@ void Restaurant::LoadFile(const string& filename) {
     cout << "File loaded successfully.\n";
     cout << "Events loaded: " << events.GetCount() << endl;
 }
+
+
 
 // ======================= Simple Simulator =======================
 
@@ -218,18 +269,18 @@ void Restaurant::SimpleSimulator() {
     cout << "\nSimulation finished." << endl;
 }
 
-// ======================= Full Simulator (with GUI) =======================
+// ======================= Full Simulator +  GUI =======================
 
 void Restaurant::FullSimulator() {
     CurrentTimeStep = 0;
-
-    cout << "Starting FullSimulator..." << endl;
 
     while (
         !events.isEmpty() ||
         !normalOrders.isEmpty() ||
         !veganOrders.isEmpty() ||
         !vipOrders.isEmpty() ||
+        !familyOrders.isEmpty() ||      
+        !expressOrders.isEmpty() ||     
         !inServiceOrders.isEmpty())
     {
         // -------- update cooks (busy -> available, idle time) --------
@@ -246,10 +297,47 @@ void Restaurant::FullSimulator() {
                 cur = cur->getNext();
             }
             };
+        auto applyHealthEmergencies = [this](LinkedList<Cook*>& list) {
+            const double injProb = 0.01;     
+            const int recoveryPeriod = 10;   
+
+            Node<Cook*>* cur = list.getHead();
+            while (cur) {
+                Cook* c = cur->getItem();
+
+                if (c->getStatus() != INJURED && c->getStatus() != ON_BREAK &&
+                    (c->getStatus() == AVAILABLE || c->getStatus() == BUSY)) {
+
+                    double r = (double)rand() / RAND_MAX;
+                    if (r < injProb) {
+                        c->markInjured(recoveryPeriod);
+                        c->setNextAvailableTime(CurrentTimeStep + recoveryPeriod);
+                      
+                      
+                    }
+                }
+
+                if (c->getStatus() == INJURED &&
+                    c->getNextAvailableTime() <= CurrentTimeStep) {
+                    c->setStatus(AVAILABLE);
+                    c->restoreSpeed();   
+                }
+
+                cur = cur->getNext();
+            }
+            };
 
         refreshCooks(normalCooks);
         refreshCooks(veganCooks);
         refreshCooks(vipCooks);
+        refreshCooks(familyCooks);      
+        refreshCooks(expressCooks); 
+        applyHealthEmergencies(normalCooks);
+        applyHealthEmergencies(veganCooks);
+        applyHealthEmergencies(vipCooks);
+        applyHealthEmergencies(familyCooks);
+        applyHealthEmergencies(expressCooks);
+
 
         // -------- handle events at this timestep --------
         Event* e;
@@ -272,6 +360,15 @@ void Restaurant::FullSimulator() {
                     vipOrders.enqueue(o);
                     totalVIPOrders++;
                 }
+                else if (o->getType() == FAMILY) {
+                    familyOrders.enqueue(o);
+                    // optional: family counter
+                }
+                else if (o->getType() == EXPRESS) {
+                    expressOrders.enqueue(o);
+                    // optional: express counter
+                }
+
             }
             else if (e->getType() == CANCELLATION) {
                 int cancelID = e->getOrderID();
@@ -281,11 +378,9 @@ void Restaurant::FullSimulator() {
                     if (tempO->getID() != cancelID)
                         tempQ.enqueue(tempO);
                     else {
-                        // totalNormalOrders-- ; // لو حابب تعدّل
                         delete tempO;
                     }
                 }
-                // move items back to normalOrders
                 while (tempQ.dequeue(tempO)) normalOrders.enqueue(tempO);
             }
             else if (e->getType() == PROMOTION) {
@@ -332,7 +427,7 @@ void Restaurant::FullSimulator() {
             }
             while (tmpG.dequeue(o)) veganOrders.enqueue(o);
 
-            // VIP (priority queue)
+            // VIP
             PriorityQueue<Order*> tmpV;
             Order* ov;
             while (vipOrders.dequeue(ov)) {
@@ -340,10 +435,77 @@ void Restaurant::FullSimulator() {
                 tmpV.enqueue(ov);
             }
             while (tmpV.dequeue(ov)) vipOrders.enqueue(ov);
+
+            // FAMILY
+            LinkedQueue<Order*> tmpF;
+            while (familyOrders.dequeue(o)) {
+                o->setWaitingTime(CurrentTimeStep - o->getArraivalTime());
+                tmpF.enqueue(o);
+            }
+            while (tmpF.dequeue(o)) familyOrders.enqueue(o);
+
+            // EXPRESS
+            LinkedQueue<Order*> tmpE;
+            while (expressOrders.dequeue(o)) {
+                o->setWaitingTime(CurrentTimeStep - o->getArraivalTime());
+                tmpE.enqueue(o);
+            }
+            while (tmpE.dequeue(o)) expressOrders.enqueue(o);
         }
 
-        // -------- auto-promotion --------
+        // -------- auto promotion (only from NORMAL) --------
         handleAutoPromotion();
+
+        // -------- progress in-service orders (decrease aining size) --------
+        {
+            LinkedList<Order*> remainingInService;
+            Order* inO;
+            while (inServiceOrders.DeleteFirst(inO)) {
+                if (inO->getStatus() == in_service && inO->getAssignedCook() != nullptr) {
+                    Cook* c = inO->getAssignedCook();
+                    int speed = c->getCurrentSpeed();
+                    if (speed <= 0) speed = 1;
+                    int rem = inO->getRemainingSize();
+                    rem -= speed;
+                    inO->setRemainingSize(rem);
+                    c->setBusyTime(c->getBusyTime() + speed);
+
+                    if (rem <= 0) {
+                        inO->setStatus(finished);
+                        inO->setFinishTime(CurrentTimeStep);
+                        finishedOrders.InsertEnd(inO);
+
+
+                        c->applyFatigue();
+                        c->incrementOrdersSinceLastBreak();
+
+                        if (c->getOrdersSinceLastBreak() >= c->getOrdersBeforeBreak()) {
+
+                            int vipWaiting = vipOrders.GetCount();
+                            bool overloaded = (vipWaiting > 5);   
+
+                            if (overloaded) {
+                                // ====== OVERTIME  ======
+                                c->applyFatigue();         
+                                c->skipNextBreak();        
+                                c->setStatus(AVAILABLE);   
+                                c->setNextAvailableTime(CurrentTimeStep); 
+                            }
+                            else {
+                                // ====== Break  ======
+                                c->setStatus(ON_BREAK);
+                                c->setNextAvailableTime(CurrentTimeStep + c->getBreakDuration());
+                                c->resetOrdersSinceLastBreak();    
+                            }
+                        }
+                        continue;
+                    }
+
+                }
+                remainingInService.InsertEnd(inO);
+            }
+            inServiceOrders = remainingInService;
+        }
 
         // helper to compute service time
         auto computeServiceTime = [](Order* o, Cook* c) -> int {
@@ -355,7 +517,7 @@ void Restaurant::FullSimulator() {
             return st;
             };
 
-        // -------- VIP orders: VIP -> Normal -> Vegan cooks --------
+        // -------- VIP orders: VIP -> Normal -> Vegan cooks (with preemption) --------
         {
             Order* o;
             while (vipOrders.peek(o)) {
@@ -365,15 +527,44 @@ void Restaurant::FullSimulator() {
                 if (!cook) cook = getFastestAvailableCook(normalCooks, VIP);
                 if (!cook) cook = getFastestAvailableCook(veganCooks, VIP);
 
+                // preempt a normal in-service order if still no cook
+                if (!cook) {
+                    Node<Order*>* cur = inServiceOrders.getHead();
+                    Order* candidate = nullptr;
+                    int bestRem = INT_MAX;
+                    while (cur) {
+                        Order* ord = cur->getItem();
+                        if (ord->getType() == NORMAL && ord->getStatus() == in_service && ord->getAssignedCook()) {
+                            int r = ord->getRemainingSize();
+                            if (r < bestRem) {
+                                bestRem = r;
+                                candidate = ord;
+                            }
+                        }
+                        cur = cur->getNext();
+                    }
+                    if (candidate) {
+                        Cook* victimCook = candidate->getAssignedCook();
+                        inServiceOrders.DeleteNode(candidate);
+                        candidate->setAssignedCook(nullptr);
+                        candidate->setStatus(waiting);
+                        normalOrders.enqueue(candidate);
+                        victimCook->setStatus(AVAILABLE);
+                        cook = victimCook;
+                    }
+                }
+
                 if (!cook) break;
 
                 vipOrders.dequeue(o);
 
+                if (o->getRemainingSize() <= 0) o->setRemainingSize(o->getOrderSize());
                 int st = computeServiceTime(o, cook);
                 o->setServiceTime(st);
                 o->setFinishTime(CurrentTimeStep + st);
                 o->setDeadline(computeDeadline(o));
                 o->setStatus(in_service);
+                o->setAssignedCook(cook);
 
                 cook->setStatus(BUSY);
                 cook->setNextAvailableTime(CurrentTimeStep + st);
@@ -398,11 +589,72 @@ void Restaurant::FullSimulator() {
                 o->setFinishTime(CurrentTimeStep + st);
                 o->setDeadline(computeDeadline(o));
                 o->setStatus(in_service);
+                o->setAssignedCook(cook);
 
                 cook->setStatus(BUSY);
                 cook->setNextAvailableTime(CurrentTimeStep + st);
                 cook->setBusyTime(cook->getBusyTime() + st);
                 cook->setHandledVeganOrders(cook->getHandledVeganOrders() + 1);
+
+                inServiceOrders.InsertEnd(o);
+            }
+        }
+
+        // -------- Family orders: Family cooks -> Normal cooks --------
+        {
+            Order* o;
+            while (familyOrders.peek(o)) {
+                Cook* cook = nullptr;
+
+                cook = getFastestAvailableCook(familyCooks, FAMILY);
+                if (!cook) cook = getFastestAvailableCook(normalCooks, FAMILY);
+
+                if (!cook) break;
+
+                familyOrders.dequeue(o);
+
+                if (o->getRemainingSize() <= 0) o->setRemainingSize(o->getOrderSize());
+                int st = computeServiceTime(o, cook);
+                o->setServiceTime(st);
+                o->setFinishTime(CurrentTimeStep + st);
+                o->setDeadline(computeDeadline(o));
+                o->setStatus(in_service);
+                o->setAssignedCook(cook);
+
+                cook->setStatus(BUSY);
+                cook->setNextAvailableTime(CurrentTimeStep + st);
+                cook->setBusyTime(cook->getBusyTime() + st);
+                // you can add separate counters for family if needed
+
+                inServiceOrders.InsertEnd(o);
+            }
+        }
+
+        // -------- Express orders: Express cooks -> VIP cooks --------
+        {
+            Order* o;
+            while (expressOrders.peek(o)) {
+                Cook* cook = nullptr;
+
+                cook = getFastestAvailableCook(expressCooks, EXPRESS);
+                if (!cook) cook = getFastestAvailableCook(vipCooks, EXPRESS);
+
+                if (!cook) break;
+
+                expressOrders.dequeue(o);
+
+                if (o->getRemainingSize() <= 0) o->setRemainingSize(o->getOrderSize());
+                int st = computeServiceTime(o, cook);
+                o->setServiceTime(st);
+                o->setFinishTime(CurrentTimeStep + st);
+                o->setDeadline(computeDeadline(o));
+                o->setStatus(in_service);
+                o->setAssignedCook(cook);
+
+                cook->setStatus(BUSY);
+                cook->setNextAvailableTime(CurrentTimeStep + st);
+                cook->setBusyTime(cook->getBusyTime() + st);
+                // can add express counters per cook here
 
                 inServiceOrders.InsertEnd(o);
             }
@@ -421,11 +673,13 @@ void Restaurant::FullSimulator() {
 
                 normalOrders.dequeue(o);
 
+                if (o->getRemainingSize() <= 0) o->setRemainingSize(o->getOrderSize());
                 int st = computeServiceTime(o, cook);
                 o->setServiceTime(st);
                 o->setFinishTime(CurrentTimeStep + st);
                 o->setDeadline(computeDeadline(o));
                 o->setStatus(in_service);
+                o->setAssignedCook(cook);
 
                 cook->setStatus(BUSY);
                 cook->setNextAvailableTime(CurrentTimeStep + st);
@@ -452,110 +706,148 @@ void Restaurant::FullSimulator() {
             inServiceOrders = remainingInService;
         }
 
-        // -------- GUI drawing --------
-        // DEBUG: print counts to help diagnose drawing issues
+        // -------- GUI drawing (unchanged تقريبًا مع إضافة family/express لو حابب تعرضهم) --------
         cout << "DBG: counts - Normal=" << normalOrders.GetCount()
             << " Vegan=" << veganOrders.GetCount()
             << " VIP=" << vipOrders.GetCount()
+            << " Family=" << familyOrders.GetCount()
+            << " Express=" << expressOrders.GetCount()
             << " InService=" << inServiceOrders.GetCount()
             << " Finished=" << finishedOrders.GetCount() << "\n";
-
-        // print first few in-service order IDs and statuses
-        {
-            Node<Order*>* curDbg = inServiceOrders.getHead();
-            int shown = 0;
-            while (curDbg && shown < 5) {
-                Order* od = curDbg->getItem();
-                cout << "DBG: InService Order ID=" << od->getID() << " Status=" << od->getStatus() << "\n";
-                curDbg = curDbg->getNext();
-                shown++;
-            }
-        }
-
         if (pGUI) {
             pGUI->ResetDrawingList();
 
             // cooks
             {
                 Node<Cook*>* cur = normalCooks.getHead();
-                while (cur) {
-                    pGUI->AddToDrawingList(cur->getItem());
-                    cur = cur->getNext();
-                }
+                while (cur) { pGUI->AddToDrawingList(cur->getItem()); cur = cur->getNext(); }
                 cur = veganCooks.getHead();
-                while (cur) {
-                    pGUI->AddToDrawingList(cur->getItem());
-                    cur = cur->getNext();
-                }
+                while (cur) { pGUI->AddToDrawingList(cur->getItem()); cur = cur->getNext(); }
                 cur = vipCooks.getHead();
-                while (cur) {
-                    pGUI->AddToDrawingList(cur->getItem());
-                    cur = cur->getNext();
-                }
+                while (cur) { pGUI->AddToDrawingList(cur->getItem()); cur = cur->getNext(); }
+                cur = familyCooks.getHead();
+                while (cur) { pGUI->AddToDrawingList(cur->getItem()); cur = cur->getNext(); }
+                cur = expressCooks.getHead();
+                while (cur) { pGUI->AddToDrawingList(cur->getItem()); cur = cur->getNext(); }
             }
 
             // waiting orders
             {
                 LinkedQueue<Order*> tmpN;
                 Order* o;
-                // Normal
-                while (normalOrders.dequeue(o)) {
-                    pGUI->AddToDrawingList(o);
-                    tmpN.enqueue(o);
-                }
-                normalOrders = tmpN;
 
-                // Vegan
+                while (normalOrders.dequeue(o)) { pGUI->AddToDrawingList(o); tmpN.enqueue(o); }
+                while (tmpN.dequeue(o)) normalOrders.enqueue(o);
+
                 LinkedQueue<Order*> tmpG;
-                while (veganOrders.dequeue(o)) {
-                    pGUI->AddToDrawingList(o);
-                    tmpG.enqueue(o);
-                }
-                veganOrders = tmpG;
+                while (veganOrders.dequeue(o)) { pGUI->AddToDrawingList(o); tmpG.enqueue(o); }
+                while (tmpG.dequeue(o)) veganOrders.enqueue(o);
 
-                // VIP
                 PriorityQueue<Order*> tmpV;
                 Order* ov;
-                while (vipOrders.dequeue(ov)) {
-                    pGUI->AddToDrawingList(ov);
-                    tmpV.enqueue(ov);
-                }
-                vipOrders = tmpV;
+                while (vipOrders.dequeue(ov)) { pGUI->AddToDrawingList(ov); tmpV.enqueue(ov); }
+                while (tmpV.dequeue(ov)) vipOrders.enqueue(ov);
+
+                LinkedQueue<Order*> tmpF;
+                while (familyOrders.dequeue(o)) { pGUI->AddToDrawingList(o); tmpF.enqueue(o); }
+                while (tmpF.dequeue(o)) familyOrders.enqueue(o);
+
+                LinkedQueue<Order*> tmpE;
+                while (expressOrders.dequeue(o)) { pGUI->AddToDrawingList(o); tmpE.enqueue(o); }
+                while (tmpE.dequeue(o)) expressOrders.enqueue(o);
             }
 
             // in-service + finished
             {
                 Node<Order*>* curO = inServiceOrders.getHead();
-                while (curO) {
-                    pGUI->AddToDrawingList(curO->getItem());
-                    curO = curO->getNext();
-                }
+                while (curO) { pGUI->AddToDrawingList(curO->getItem()); curO = curO->getNext(); }
                 curO = finishedOrders.getHead();
-                while (curO) {
-                    pGUI->AddToDrawingList(curO->getItem());
-                    curO = curO->getNext();
-                }
+                while (curO) { pGUI->AddToDrawingList(curO->getItem()); curO = curO->getNext(); }
             }
 
             pGUI->UpdateInterface();
 
+            // ========= الجزء الجديد بتاع الرسالة =========
+
+            // waiting counts
+            int wN = normalOrders.GetCount();
+            int wG = veganOrders.GetCount();
+            int wV = vipOrders.GetCount();
+            int wF = familyOrders.GetCount();
+            int wE = expressOrders.GetCount();
+
+            // available cooks
+            auto countAvailable = [](LinkedList<Cook*>& lst) {
+                int c = 0;
+                Node<Cook*>* cur = lst.getHead();
+                while (cur) {
+                    if (cur->getItem()->getStatus() == AVAILABLE)
+                        c++;
+                    cur = cur->getNext();
+                }
+                return c;
+                };
+
+            int avN = countAvailable(normalCooks);
+            int avG = countAvailable(veganCooks);
+            int avV = countAvailable(vipCooks);
+            int avF = countAvailable(familyCooks);
+            int avE = countAvailable(expressCooks);
+
+            // served so far
+            int sN = 0, sG = 0, sV = 0, sF = 0, sE = 0;
+            {
+                Node<Order*>* cur = finishedOrders.getHead();
+                while (cur) {
+                    Order* o = cur->getItem();
+                    switch (o->getType()) {
+                    case NORMAL:  sN++; break;
+                    case VEGAN:   sG++; break;
+                    case VIP:     sV++; break;
+                    case FAMILY:  sF++; break;
+                    case EXPRESS: sE++; break;
+                    }
+                    cur = cur->getNext();
+                }
+            }
+
+            string msg = "TS " + to_string(CurrentTimeStep);
+
+            msg += " | Waiting N/G/V/F/E = " +
+                to_string(wN) + "/" + to_string(wG) + "/" +
+                to_string(wV) + "/" + to_string(wF) + "/" +
+                to_string(wE);
+
+            msg += " | Av Cooks N/G/V/F/E = " +
+                to_string(avN) + "/" + to_string(avG) + "/" +
+                to_string(avV) + "/" + to_string(avF) + "/" +
+                to_string(avE);
+
+            msg += " | Served N/G/V/F/E = " +
+                to_string(sN) + "/" + to_string(sG) + "/" +
+                to_string(sV) + "/" + to_string(sF) + "/" +
+                to_string(sE);
+
             if (mode == MODE_INTR) {
-                pGUI->PrintMessage("Time step: " + to_string(CurrentTimeStep) + "  (click to continue)");
+                msg += "  (click to continue)";
+                pGUI->PrintMessage(msg);
                 pGUI->waitForClick();
             }
             else if (mode == MODE_STEP) {
-                pGUI->PrintMessage("Time step: " + to_string(CurrentTimeStep));
+                pGUI->PrintMessage(msg);
                 Sleep(1000);
             }
-            // MODE_SLNT: لا توقف
         }
 
-        // -------- console report (اختياري) --------
+
+        // -------- console report --------
         cout << "\nTime Step: " << CurrentTimeStep << endl;
-        cout << "Waiting N/Veg/VIP = "
+        cout << "Waiting N/Veg/VIP/Fam/Exp = "
             << normalOrders.GetCount() << " / "
             << veganOrders.GetCount() << " / "
-            << vipOrders.GetCount() << endl;
+            << vipOrders.GetCount() << " / "
+            << familyOrders.GetCount() << " / "
+            << expressOrders.GetCount() << endl;
         cout << "In-Service: " << inServiceOrders.GetCount()
             << "  Finished: " << finishedOrders.GetCount() << endl;
 
@@ -571,18 +863,50 @@ void Restaurant::FullSimulator() {
     writeOutputFile("output.txt");
 }
 
-// ======================= Helpers =======================
 
-// لسه TODO لو محتاج ترتّب الليست بالسيرعة
+
+
 void Restaurant::insertCookSortedBySpeed(LinkedList<Cook*>& list, Cook* c) {
-    // تقدر تكملها بعدين لو عايز ترتيب معين
+    
+    if (!list.getHead()) {
+        list.InsertBeg(c);
+        return;
+    }
+
+    Node<Cook*>* cur = list.getHead();
+    Node<Cook*>* prev = nullptr;
+
+   
+    while (cur) {
+        Cook* cc = cur->getItem();
+        if (c->getBaseSpeed() > cc->getBaseSpeed()) {
+            
+            break;
+        }
+        prev = cur;
+        cur = cur->getNext();
+    }
+
+    if (!prev) {
+        
+        list.InsertBeg(c);
+    }
+    else if (!cur) {
+        
+        list.InsertEnd(c);
+    }
+    else {
+
+        list.InsertAfter(prev, c);
+    }
 }
 
 Cook* Restaurant::getFastestAvailableCook(LinkedList<Cook*>& list, OrderType orderType) {
     Node<Cook*>* cur = list.getHead();
     while (cur) {
         Cook* c = cur->getItem();
-        if (c->getStatus() == AVAILABLE && c->getNextAvailableTime() <= CurrentTimeStep) {
+        if (c->getStatus() == AVAILABLE &&
+            c->getNextAvailableTime() <= CurrentTimeStep) {   
             return c;
         }
         cur = cur->getNext();
@@ -628,7 +952,7 @@ void Restaurant::writeOutputFile(const string& outName) {
         }
     }
 
-    // sort by FT then ST
+    // sort by FT then ST (ascending)
     for (int i = 0; i < n; ++i) {
         for (int j = i + 1; j < n; ++j) {
             if (arr[j]->getFinishTime() < arr[i]->getFinishTime() ||
@@ -641,11 +965,16 @@ void Restaurant::writeOutputFile(const string& outName) {
         }
     }
 
-    // print finished orders
+    // per-type counters for finished orders
+    int finishedNorm = 0, finishedVeg = 0, finishedVIP = 0;
+
+  
     fout << "FT ID AT WT ST\n";
+
     double sumWT = 0, sumST = 0;
     for (int i = 0; i < n; ++i) {
         o = arr[i];
+
         fout << (int)o->getFinishTime() << " "
             << o->getID() << " "
             << (int)o->getArraivalTime() << " "
@@ -654,25 +983,54 @@ void Restaurant::writeOutputFile(const string& outName) {
 
         sumWT += o->getWaitingTime();
         sumST += o->getServiceTime();
+
+        if (o->getType() == NORMAL)      finishedNorm++;
+        else if (o->getType() == VEGAN)  finishedVeg++;
+        else if (o->getType() == VIP)    finishedVIP++;
     }
 
     double avgWT = (n > 0) ? sumWT / n : 0.0;
     double avgST = (n > 0) ? sumST / n : 0.0;
 
-    fout << "\nOrders: "
-        << (totalNormalOrders + totalVeganOrders + totalVIPOrders)
-        << " [Normal: " << totalNormalOrders
-        << ", Vegan: " << totalVeganOrders
-        << ", VIP: " << totalVIPOrders << "]\n";
+    fout << "\n";
 
-    fout << "Auto-promoted: " << autoPromotedCount << "\n";
-    fout << "Avg Wait: " << avgWT << "\n";
-    fout << "Avg Serv: " << avgST << "\n";
+    //  total number of orders and total of each order type
+    fout << "Orders: " << n
+        << " [Norm:" << finishedNorm
+        << ", Veg:" << finishedVeg
+        << ", VIP:" << finishedVIP << "]\n";
 
+    //  total number of cooks and total of each cook type
+    int numNormC = normalCooks.GetCount();
+    int numVegC = veganCooks.GetCount();
+    int numVipC = vipCooks.GetCount();
+    int numFamC = familyCooks.GetCount();
+    int numExpC = expressCooks.GetCount();
+    int totalCooks = numNormC + numVegC + numVipC + numFamC + numExpC;
+
+    fout << "Cooks: " << totalCooks
+        << " [Norm:" << numNormC
+        << ", Veg:" << numVegC
+        << ", VIP:" << numVipC
+        << ", Fam:" << numFamC
+        << ", Exp:" << numExpC << "]\n";
+
+    // 3) average waiting time and average service time
+    fout << "Avg Wait = " << avgWT
+        << ", Avg Serv = " << avgST << "\n";
+
+    // 4) percentage of automatically promoted orders (relative to total normal orders)
+    double autoPerc = (totalNormalOrders > 0)
+        ? (100.0 * autoPromotedCount / totalNormalOrders)
+        : 0.0;
+    fout << "Auto-promoted: " << autoPerc << "%\n\n";
+
+    // 5) per-cook statistics
     auto printCookStats = [&fout](LinkedList<Cook*>& list, char typePrefix) {
         Node<Cook*>* cur = list.getHead();
         while (cur) {
             Cook* c = cur->getItem();
+
             int busy = c->getBusyTime();
             int idle = c->getIdleTime();
             int br = c->getBreakTime() + c->getInjuryTime();
@@ -680,13 +1038,13 @@ void Restaurant::writeOutputFile(const string& outName) {
             double util = (denom > 0) ? (100.0 * busy / denom) : 0.0;
 
             fout << "Cook " << typePrefix << c->getID()
-                << ": Norm=" << c->getHandledNormalOrders()
-                << ", Veg=" << c->getHandledVeganOrders()
-                << ", VIP=" << c->getHandledVIPOrders()
-                << ", Busy=" << busy
-                << ", Idle=" << idle
-                << ", Break/Injury=" << br
-                << ", Util=" << util << "%\n";
+                << ": Orders [Norm:" << c->getHandledNormalOrders()
+                << ", Veg:" << c->getHandledVeganOrders()
+                << ", VIP:" << c->getHandledVIPOrders()
+                << "], Busy: " << busy
+                << ", Idle: " << idle
+                << ", Break/Injury: " << br << ",\n";
+            fout << "Utilization: " << util << "%\n";
 
             cur = cur->getNext();
         }
@@ -695,6 +1053,36 @@ void Restaurant::writeOutputFile(const string& outName) {
     printCookStats(normalCooks, 'N');
     printCookStats(veganCooks, 'G');
     printCookStats(vipCooks, 'V');
+    printCookStats(familyCooks, 'F');   
+    printCookStats(expressCooks, 'E');   
 
     fout.close();
 }
+void Restaurant::Run() {
+    cout << "Select mode: 1-Interactive  2-Step  3-Silent: ";
+    int m;
+    cin >> m;
+    if (m == 1) mode = MODE_INTR;
+    else if (m == 2) mode = MODE_STEP;
+    else mode = MODE_SLNT;
+
+    if (mode != MODE_SLNT) {
+        pGUI->PrintMessage("Please enter input file name:");
+        string fname = pGUI->GetString();
+        LoadFile(fname);
+    }
+    else {
+        cout << "Enter input file name: ";
+        string fname;
+        cin >> fname;
+        LoadFile(fname);
+    }
+
+    FullSimulator();
+    if (mode == MODE_SLNT) {
+        cout << "Silent mode... Simulation ends, output file created.\n";
+    }
+}
+
+
+

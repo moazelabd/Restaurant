@@ -24,7 +24,7 @@ enum PROG_MODE
 };
 
 // Maximum possible counts used by the GUI
-const int MaxPossibleOrdCnt = 200;   // adjust if you want
+const int MaxPossibleOrdCnt = 200;   
 const int MaxPossibleMcCnt = 50;
 
 

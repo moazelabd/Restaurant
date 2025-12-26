@@ -100,6 +100,12 @@
     <ClInclude Include="resturant.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="cook.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="enums.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CMUgraphicsLib\jpeg\jcomapi.c">
@@ -233,8 +239,9 @@
     <Text Include="CMUgraphicsLib\Readme.txt">
       <Filter>CMUGraphicsLib</Filter>
     </Text>
-    <Text Include="test.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
+    <Text Include="test2.txt" />
+    <Text Include="test3.txt" />
+    <Text Include="test.txt" />
+    <Text Include="output.txt" />
   </ItemGroup>
 </Project>

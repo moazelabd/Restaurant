@@ -18,6 +18,7 @@ private:
     double serviceTime;
     double finishTime;
     Orderstatus Status;
+    class Cook* assignedCook;
 public:
     Order();
     ~Order();
@@ -48,6 +49,8 @@ public:
 
     // Print order data
     void print() const;
+    void setAssignedCook(class Cook* c);
+    class Cook* getAssignedCook() const;
 };
 
 #endif

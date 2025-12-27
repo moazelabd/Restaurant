@@ -1059,30 +1059,12 @@ void Restaurant::writeOutputFile(const string& outName) {
     fout.close();
 }
 void Restaurant::Run() {
-    cout << "Select mode: 1-Interactive  2-Step  3-Silent: ";
-    int m;
-    cin >> m;
-    if (m == 1) mode = MODE_INTR;
-    else if (m == 2) mode = MODE_STEP;
-    else mode = MODE_SLNT;
-
-    if (mode != MODE_SLNT) {
+  
         pGUI->PrintMessage("Please enter input file name:");
-        string fname = pGUI->GetString();
+        string fname = pGUI->GetString();      
         LoadFile(fname);
-    }
-    else {
-        cout << "Enter input file name: ";
-        string fname;
-        cin >> fname;
-        LoadFile(fname);
-    }
-
+    
     FullSimulator();
-    if (mode == MODE_SLNT) {
-        cout << "Silent mode... Simulation ends, output file created.\n";
-    }
 }
-
 
 

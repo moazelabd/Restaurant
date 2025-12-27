@@ -1,0 +1,59 @@
+FT ID AT WT ST
+3 1001 1 0 2
+4 1002 1 0 3
+4 1003 1 0 3
+4 1006 1 0 3
+4 1007 1 0 3
+5 1004 1 0 4
+5 1005 1 0 4
+7 1011 2 2 3
+7 1012 2 2 3
+15 1008 1 11 3
+16 1013 2 10 4
+17 1019 3 8 6
+20 1020 3 8 9
+22 1023 4 8 10
+22 1022 4 8 10
+25 1017 3 8 14
+26 1018 3 8 15
+29 1016 2 24 3
+30 1028 6 11 13
+30 1021 4 8 18
+32 1015 2 28 2
+34 1014 2 28 4
+42 1029 6 10 26
+42 1030 6 9 27
+44 1025 5 17 22
+44 1027 6 14 24
+45 1026 5 17 23
+46 1024 5 20 21
+48 1009 1 43 4
+49 1010 1 43 5
+
+Orders: 30 [Norm:9, Veg:0, VIP:21]
+Cooks: 11 [Norm:6, Veg:1, VIP:2, Fam:1, Exp:1]
+Avg Wait = 11.5, Avg Serv = 9.7
+Auto-promoted: 233.333%
+
+Cook N1: Orders [Norm:2, Veg:0, VIP:2], Busy: 61, Idle: 2, Break/Injury: 0,
+Utilization: 96.8254%
+Cook N2: Orders [Norm:2, Veg:0, VIP:2], Busy: 69, Idle: 2, Break/Injury: 0,
+Utilization: 97.1831%
+Cook N3: Orders [Norm:2, Veg:0, VIP:2], Busy: 90, Idle: 2, Break/Injury: 0,
+Utilization: 97.8261%
+Cook N4: Orders [Norm:0, Veg:0, VIP:3], Busy: 83, Idle: 2, Break/Injury: 20,
+Utilization: 79.0476%
+Cook N5: Orders [Norm:2, Veg:0, VIP:2], Busy: 98, Idle: 2, Break/Injury: 0,
+Utilization: 98%
+Cook N6: Orders [Norm:2, Veg:0, VIP:2], Busy: 90, Idle: 2, Break/Injury: 0,
+Utilization: 97.8261%
+Cook G1: Orders [Norm:0, Veg:0, VIP:3], Busy: 71, Idle: 12, Break/Injury: 0,
+Utilization: 85.5422%
+Cook V1: Orders [Norm:3, Veg:0, VIP:2], Busy: 119, Idle: 6, Break/Injury: 0,
+Utilization: 95.2%
+Cook V2: Orders [Norm:3, Veg:0, VIP:3], Busy: 128, Idle: 2, Break/Injury: 0,
+Utilization: 98.4615%
+Cook F1: Orders [Norm:0, Veg:0, VIP:0], Busy: 0, Idle: 50, Break/Injury: 0,
+Utilization: 0%
+Cook E1: Orders [Norm:0, Veg:0, VIP:0], Busy: 0, Idle: 40, Break/Injury: 10,
+Utilization: 0%

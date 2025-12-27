@@ -19,6 +19,8 @@ GUI::GUI()
     DrawingColors[0] = RED;       // NORMAL
     DrawingColors[1] = DARKBLUE;  // VEGAN
     DrawingColors[2] = VIOLET;    // VIP
+	DrawingColors[3] = DARKGREEN; // FAMILY
+	DrawingColors[4] = ORANGE;    // EXPRESS
 
     ClearStatusBar();
     ClearDrawingArea();

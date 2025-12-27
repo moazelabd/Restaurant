@@ -151,7 +151,7 @@ public:
         cout << endl;
     }
     int GetCount() const { return count; }
-
+	//this function inserts a new node after the given previous node
 
     void InsertAfter(Node<T>* prev, T item) {
         if (prev == nullptr) {

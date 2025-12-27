@@ -27,7 +27,7 @@ class GUI
 
 private:
     window* pWind;
-    color DrawingColors[3];   // NORMAL, VEGAN, VIP
+    color DrawingColors[5];   // NORMAL, VEGAN, VIP, FAMILY, EXPRESS
 
     static const int
         WindWidth = 1200, WindHeight = 650,

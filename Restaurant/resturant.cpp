@@ -271,8 +271,8 @@ void Restaurant::LoadFile(const string& filename) {
 
 void Restaurant::FullSimulator() {
     CurrentTimeStep = 0;
-
-    while (
+	const int MAX_TIMESTEP = 100; 
+	while (CurrentTimeStep < MAX_TIMESTEP &&
         !events.isEmpty() ||
         !normalOrders.isEmpty() ||
         !veganOrders.isEmpty() ||
@@ -619,7 +619,7 @@ void Restaurant::FullSimulator() {
                 cook->setStatus(BUSY);
                 cook->setNextAvailableTime(CurrentTimeStep + st);
                 cook->setBusyTime(cook->getBusyTime() + st);
-                // you can add separate counters for family if needed
+                cook->setHandledfamilyOrders(cook->gethandlefamilyOrders() + 1);
 
                 inServiceOrders.InsertEnd(o);
             }
@@ -649,7 +649,7 @@ void Restaurant::FullSimulator() {
                 cook->setStatus(BUSY);
                 cook->setNextAvailableTime(CurrentTimeStep + st);
                 cook->setBusyTime(cook->getBusyTime() + st);
-                // can add express counters per cook here
+                cook->setHandledexpressOrders(cook->gethandleexpressOrders() + 1);
 
                 inServiceOrders.InsertEnd(o);
             }
@@ -928,7 +928,7 @@ void Restaurant::handleAutoPromotion() {
     normalOrders = tmp;
 }
 
-// ======================= Output file =======================
+// ======================= Output file ==================================================================
 
 void Restaurant::writeOutputFile(const string& outName)
 {
@@ -1093,5 +1093,6 @@ void Restaurant::Run() {
     
     FullSimulator();
 }
+
 
 

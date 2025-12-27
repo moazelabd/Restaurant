@@ -271,16 +271,15 @@ void Restaurant::LoadFile(const string& filename) {
 
 void Restaurant::FullSimulator() {
     CurrentTimeStep = 0;
+    int safetyMax = 100; // Stop after 100 steps no matter what
 
-    while (
-        !events.isEmpty() ||
-        !normalOrders.isEmpty() ||
-        !veganOrders.isEmpty() ||
-        !vipOrders.isEmpty() ||
-        !familyOrders.isEmpty() ||
-        !expressOrders.isEmpty() ||
-        !inServiceOrders.isEmpty())
+    while (CurrentTimeStep < safetyMax && (
+        !events.isEmpty() || !normalOrders.isEmpty() ||
+        !veganOrders.isEmpty() || !vipOrders.isEmpty() ||
+        !familyOrders.isEmpty() || !expressOrders.isEmpty() ||
+        !inServiceOrders.isEmpty()))
     {
+ 
         // -------- update cooks (busy -> available, idle time) --------
         auto refreshCooks = [this](LinkedList<Cook*>& list) {
             Node<Cook*>* cur = list.getHead();
@@ -834,16 +833,7 @@ void Restaurant::FullSimulator() {
         }
 
 
-        // -------- console report --------
-        cout << "\nTime Step: " << CurrentTimeStep << endl;
-        cout << "Waiting N/Veg/VIP/Fam/Exp = "
-            << normalOrders.GetCount() << " / "
-            << veganOrders.GetCount() << " / "
-            << vipOrders.GetCount() << " / "
-            << familyOrders.GetCount() << " / "
-            << expressOrders.GetCount() << endl;
-        cout << "In-Service: " << inServiceOrders.GetCount()
-            << "  Finished: " << finishedOrders.GetCount() << endl;
+        
 
         CurrentTimeStep++;
     }

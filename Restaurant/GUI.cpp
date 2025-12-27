@@ -224,9 +224,10 @@ void GUI::AddToDrawingList(Order* pOrd)
     DrawingItem* pDitem = new DrawingItem;
     pDitem->ID = pOrd->getID();
 
-    OrderType t = pOrd->getType();      // NORMAL, VEGAN, VIP
+    // NORMAL, VEGAN, VIP, FAMILY, EXPRESS
+    OrderType t = pOrd->getType();
     int idx = static_cast<int>(t);
-    if (idx < 0 || idx > 2) idx = 0;
+    if (idx < 0 || idx > 4) idx = 0;          
     pDitem->clr = DrawingColors[idx];
 
     Orderstatus st = pOrd->getStatus();
@@ -251,6 +252,7 @@ void GUI::AddToDrawingList(Order* pOrd)
     pDitem->region = reg;
     DrawingList[DrawingItemsCount++] = pDitem;
 }
+
 
 // add cook to drawing list
 void GUI::AddToDrawingList(Cook* pC)

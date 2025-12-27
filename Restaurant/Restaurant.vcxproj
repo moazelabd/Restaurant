@@ -97,6 +97,7 @@
     <ClInclude Include="CMUgraphicsLib\windowinput.h" />
     <ClInclude Include="cook.h" />
     <ClInclude Include="enums.h" />
+    <ClInclude Include="event.h" />
     <ClInclude Include="GUI.h" />
     <ClInclude Include="LinkedList.h" />
     <ClInclude Include="LinkedQueue.h" />

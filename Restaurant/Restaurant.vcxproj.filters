@@ -106,6 +106,9 @@
     <ClInclude Include="enums.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="event.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CMUgraphicsLib\jpeg\jcomapi.c">

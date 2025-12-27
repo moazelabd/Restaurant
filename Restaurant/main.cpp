@@ -14,8 +14,6 @@ int main() {
 
     r.Run();   
 
-    cout << "\nPress Enter to exit...";
-    cin.get();
 
     delete pGUI;
     return 0;

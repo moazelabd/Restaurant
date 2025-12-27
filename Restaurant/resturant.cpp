@@ -23,6 +23,7 @@ Restaurant::Restaurant()
 void Restaurant::setGUI(GUI* g, PROG_MODE m) {
     pGUI = g;
     mode = m;
+    
 }
 
 // Compute deadline for an order
@@ -56,19 +57,19 @@ void Restaurant::LoadFile(const string& filename) {
     int ordersBeforeBreak;
     int breakNormal, breakVIP, breakVegan, breakFamily, breakExpress;
 
-    // 1) read number of cooks for each type: N G V F E
+    //  read number of cooks for each type: N G V F E
     fin >> numNormal >> numVegan >> numVIP >> numFamily >> numExpress;
 
-    // 2) read speeds: SN SG SV SF SE
+    //  read speeds: SN SG SV SF SE
     fin >> speedNormal >> speedVegan >> speedVIP >> speedFamily >> speedExpress;
 
-    // 3) read break info: BO BN BG BV BF BE
+    //  read break info: BO BN BG BV BF BE
     fin >> ordersBeforeBreak >> breakNormal >> breakVegan >> breakVIP >> breakFamily >> breakExpress;
 
-    // 4) read auto promotion limit
+    // read auto promotion limit
     fin >> AutoPromotionLimit;
 
-    // 5) read number of events: M
+    //  read number of events: M
     int numEvents;
     fin >> numEvents;
 
@@ -84,7 +85,6 @@ void Restaurant::LoadFile(const string& filename) {
         c->setOrdersBeforeBreak(ordersBeforeBreak);
         c->setBreakDuration(breakNormal);
         c->setNextAvailableTime(0);
-
         insertCookSortedBySpeed(normalCooks, c);
     }
 
@@ -98,7 +98,6 @@ void Restaurant::LoadFile(const string& filename) {
         c->setOrdersBeforeBreak(ordersBeforeBreak);
         c->setBreakDuration(breakVegan);
         c->setNextAvailableTime(0);
-
         insertCookSortedBySpeed(veganCooks, c);
     }
 
@@ -112,11 +111,10 @@ void Restaurant::LoadFile(const string& filename) {
         c->setOrdersBeforeBreak(ordersBeforeBreak);
         c->setBreakDuration(breakVIP);
         c->setNextAvailableTime(0);
-
         insertCookSortedBySpeed(vipCooks, c);
     }
 
-    // Family cooks (new type)
+    // Family cooks 
     for (int i = 0; i < numFamily; ++i) {
         Cook* c = new Cook();
         c->setID(familyID++);
@@ -130,7 +128,7 @@ void Restaurant::LoadFile(const string& filename) {
         insertCookSortedBySpeed(familyCooks, c);
     }
 
-    // Express cooks (new type)
+    // Express cooks 
     for (int i = 0; i < numExpress; ++i) {
         Cook* c = new Cook();
         c->setID(expressID++);
@@ -160,8 +158,8 @@ void Restaurant::LoadFile(const string& filename) {
             if (orderType == "N") o->setOrderType(NORMAL);
             else if (orderType == "V") o->setOrderType(VIP);
             else if (orderType == "G") o->setOrderType(VEGAN);
-            else if (orderType == "F") o->setOrderType(FAMILY);   // new
-            else if (orderType == "E") o->setOrderType(EXPRESS);  // new
+            else if (orderType == "F") o->setOrderType(FAMILY);   
+            else if (orderType == "E") o->setOrderType(EXPRESS);  
 
             o->setOrderSize(size);
             o->setID(id);
@@ -197,7 +195,7 @@ void Restaurant::LoadFile(const string& filename) {
 
 // ======================= Simple Simulator =======================
 
-void Restaurant::SimpleSimulator() {
+/*void Restaurant::SimpleSimulator() {
     CurrentTimeStep = 0;
 
     while (
@@ -268,7 +266,7 @@ void Restaurant::SimpleSimulator() {
 
     cout << "\nSimulation finished." << endl;
 }
-
+*/
 // ======================= Full Simulator +  GUI =======================
 
 void Restaurant::FullSimulator() {
@@ -296,10 +294,10 @@ void Restaurant::FullSimulator() {
                 }
                 cur = cur->getNext();
             }
-            };
+        };
         auto applyHealthEmergencies = [this](LinkedList<Cook*>& list) {
-            const double injProb = 0.01;     
-            const int recoveryPeriod = 10;   
+			const double injProb = 0.01;    //1% injury probability per timestep 
+			const int recoveryPeriod = 10;   // fixed recovery period of 10 timesteps
 
             Node<Cook*>* cur = list.getHead();
             while (cur) {
@@ -362,11 +360,9 @@ void Restaurant::FullSimulator() {
                 }
                 else if (o->getType() == FAMILY) {
                     familyOrders.enqueue(o);
-                    // optional: family counter
                 }
                 else if (o->getType() == EXPRESS) {
                     expressOrders.enqueue(o);
-                    // optional: express counter
                 }
 
             }
@@ -453,10 +449,10 @@ void Restaurant::FullSimulator() {
             while (tmpE.dequeue(o)) expressOrders.enqueue(o);
         }
 
-        // -------- auto promotion (only from NORMAL) --------
+        // -------- auto promotion (only from NORMAL orders) --------
         handleAutoPromotion();
 
-        // -------- progress in-service orders (decrease aining size) --------
+        // -------- progress in-service orders (decrease remaining size) --------
         {
             LinkedList<Order*> remainingInService;
             Order* inO;
@@ -468,7 +464,6 @@ void Restaurant::FullSimulator() {
                     int rem = inO->getRemainingSize();
                     rem -= speed;
                     inO->setRemainingSize(rem);
-                    c->setBusyTime(c->getBusyTime() + speed);
 
                     if (rem <= 0) {
                         inO->setStatus(finished);
@@ -706,7 +701,7 @@ void Restaurant::FullSimulator() {
             inServiceOrders = remainingInService;
         }
 
-        // -------- GUI drawing (unchanged تقريبًا مع إضافة family/express لو حابب تعرضهم) --------
+        // -------- GUI drawing  --------
         cout << "DBG: counts - Normal=" << normalOrders.GetCount()
             << " Vegan=" << veganOrders.GetCount()
             << " VIP=" << vipOrders.GetCount()
@@ -767,7 +762,6 @@ void Restaurant::FullSimulator() {
 
             pGUI->UpdateInterface();
 
-            // ========= الجزء الجديد بتاع الرسالة =========
 
             // waiting counts
             int wN = normalOrders.GetCount();
@@ -1015,17 +1009,19 @@ void Restaurant::writeOutputFile(const string& outName) {
         << ", Fam:" << numFamC
         << ", Exp:" << numExpC << "]\n";
 
-    // 3) average waiting time and average service time
+    //  average waiting time and average service time
     fout << "Avg Wait = " << avgWT
         << ", Avg Serv = " << avgST << "\n";
 
-    // 4) percentage of automatically promoted orders (relative to total normal orders)
+    //  percentage of automatically promoted orders (relative to total normal orders)
     double autoPerc = (totalNormalOrders > 0)
         ? (100.0 * autoPromotedCount / totalNormalOrders)
         : 0.0;
-    fout << "Auto-promoted: " << autoPerc << "%\n\n";
+    fout << "Auto-promoted: " << autoPromotedCount
+        << " (" << autoPerc << "%)\n";
 
-    // 5) per-cook statistics
+
+    //  per-cook statistics
     auto printCookStats = [&fout](LinkedList<Cook*>& list, char typePrefix) {
         Node<Cook*>* cur = list.getHead();
         while (cur) {

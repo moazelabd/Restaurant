@@ -24,7 +24,7 @@ private:
     // waiting orders
     LinkedQueue<Order*> normalOrders;
     LinkedQueue<Order*> veganOrders;
-    PriorityQueue<Order*> vipOrders;
+	PriorityQueue<Order*> vipOrders;//priority queue for vip orders
     LinkedQueue<Order*> familyOrders;
     LinkedQueue<Order*> expressOrders;
 

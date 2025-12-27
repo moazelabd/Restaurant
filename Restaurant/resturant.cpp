@@ -277,8 +277,8 @@ void Restaurant::FullSimulator() {
         !normalOrders.isEmpty() ||
         !veganOrders.isEmpty() ||
         !vipOrders.isEmpty() ||
-        !familyOrders.isEmpty() ||      
-        !expressOrders.isEmpty() ||     
+        !familyOrders.isEmpty() ||
+        !expressOrders.isEmpty() ||
         !inServiceOrders.isEmpty())
     {
         // -------- update cooks (busy -> available, idle time) --------
@@ -930,28 +930,34 @@ void Restaurant::handleAutoPromotion() {
 
 // ======================= Output file =======================
 
-void Restaurant::writeOutputFile(const string& outName) {
+void Restaurant::writeOutputFile(const string& outName)
+{
     ofstream fout(outName);
-    if (!fout.is_open()) return;
+    if (!fout.is_open()) {
+        cout << "Error: cannot open output file\n";
+        return;
+    }
 
-    // collect finished orders into array
+    // ================= Collect Finished Orders =================
     const int MAX_ORDERS = 10000;
     Order* arr[MAX_ORDERS];
     int n = 0;
 
+    LinkedList<Order*> tempFinished = finishedOrders;
     Order* o;
-    while (finishedOrders.DeleteFirst(o)) {
-        if (n < MAX_ORDERS) {
+
+    while (tempFinished.DeleteFirst(o)) {
+        if (n < MAX_ORDERS)
             arr[n++] = o;
-        }
     }
 
-    // sort by FT then ST (ascending)
-    for (int i = 0; i < n; ++i) {
-        for (int j = i + 1; j < n; ++j) {
+    // ================= Sort by Finish Time then Service Time =================
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = i + 1; j < n; j++) {
             if (arr[j]->getFinishTime() < arr[i]->getFinishTime() ||
                 (arr[j]->getFinishTime() == arr[i]->getFinishTime() &&
-                    arr[j]->getServiceTime() < arr[i]->getServiceTime())) {
+                    arr[j]->getServiceTime() < arr[i]->getServiceTime()))
+            {
                 Order* tmp = arr[i];
                 arr[i] = arr[j];
                 arr[j] = tmp;
@@ -959,101 +965,126 @@ void Restaurant::writeOutputFile(const string& outName) {
         }
     }
 
-    // per-type counters for finished orders
-    int finishedNorm = 0, finishedVeg = 0, finishedVIP = 0;
-
-  
-    fout << "FT ID AT WT ST\n";
+    // ================= Statistics =================
+    int finishedN = 0, finishedG = 0, finishedV = 0, finishedF = 0, finishedE = 0;
+    int lateN = 0, lateG = 0, lateV = 0, lateF = 0, lateE = 0;
 
     double sumWT = 0, sumST = 0;
-    for (int i = 0; i < n; ++i) {
+
+    fout << "FT ID AT WT ST\n";
+
+    for (int i = 0; i < n; i++) {
         o = arr[i];
 
-        fout << (int)o->getFinishTime() << " "
+        fout << o->getFinishTime() << " "
             << o->getID() << " "
-            << (int)o->getArraivalTime() << " "
-            << (int)o->getWaitingTime() << " "
-            << (int)o->getServiceTime() << "\n";
+            << o->getArraivalTime() << " "
+            << o->getWaitingTime() << " "
+            << o->getServiceTime() << "\n";
 
         sumWT += o->getWaitingTime();
         sumST += o->getServiceTime();
 
-        if (o->getType() == NORMAL)      finishedNorm++;
-        else if (o->getType() == VEGAN)  finishedVeg++;
-        else if (o->getType() == VIP)    finishedVIP++;
+        double FT = o->getFinishTime();
+        double D = o->getDeadline();
+
+        switch (o->getType()) {
+        case NORMAL:   finishedN++; if (FT > D) lateN++; break;
+        case VEGAN:    finishedG++; if (FT > D) lateG++; break;
+        case VIP:      finishedV++; if (FT > D) lateV++; break;
+        case FAMILY:   finishedF++; if (FT > D) lateF++; break;
+        case EXPRESS:  finishedE++; if (FT > D) lateE++; break;
+        }
     }
 
-    double avgWT = (n > 0) ? sumWT / n : 0.0;
-    double avgST = (n > 0) ? sumST / n : 0.0;
+    double avgWT = (n > 0) ? sumWT / n : 0;
+    double avgST = (n > 0) ? sumST / n : 0;
 
-    fout << "\n";
+    // ================= Orders Summary =================
+    fout << "\nOrders: " << n
+        << " [Norm:" << finishedN
+        << ", Veg:" << finishedG
+        << ", VIP:" << finishedV
+        << ", Fam:" << finishedF
+        << ", Exp:" << finishedE << "]\n";
 
-    //  total number of orders and total of each order type
-    fout << "Orders: " << n
-        << " [Norm:" << finishedNorm
-        << ", Veg:" << finishedVeg
-        << ", VIP:" << finishedVIP << "]\n";
+    // ================= Cooks Summary =================
+    int nN = normalCooks.GetCount();
+    int nG = veganCooks.GetCount();
+    int nV = vipCooks.GetCount();
+    int nF = familyCooks.GetCount();
+    int nE = expressCooks.GetCount();
 
-    //  total number of cooks and total of each cook type
-    int numNormC = normalCooks.GetCount();
-    int numVegC = veganCooks.GetCount();
-    int numVipC = vipCooks.GetCount();
-    int numFamC = familyCooks.GetCount();
-    int numExpC = expressCooks.GetCount();
-    int totalCooks = numNormC + numVegC + numVipC + numFamC + numExpC;
+    fout << "Cooks: " << (nN + nG + nV + nF + nE)
+        << " [Norm:" << nN
+        << ", Veg:" << nG
+        << ", VIP:" << nV
+        << ", Fam:" << nF
+        << ", Exp:" << nE << "]\n";
 
-    fout << "Cooks: " << totalCooks
-        << " [Norm:" << numNormC
-        << ", Veg:" << numVegC
-        << ", VIP:" << numVipC
-        << ", Fam:" << numFamC
-        << ", Exp:" << numExpC << "]\n";
-
-    //  average waiting time and average service time
+    // ================= Averages =================
     fout << "Avg Wait = " << avgWT
         << ", Avg Serv = " << avgST << "\n";
 
-    //  percentage of automatically promoted orders (relative to total normal orders)
+    // ================= Auto Promotion =================
     double autoPerc = (totalNormalOrders > 0)
-        ? (100.0 * autoPromotedCount / totalNormalOrders)
-        : 0.0;
+        ? (100.0 * autoPromotedCount /
+            (totalNormalOrders + autoPromotedCount))
+        : 0;
+
     fout << "Auto-promoted: " << autoPromotedCount
         << " (" << autoPerc << "%)\n";
 
+    // ================= Late Orders =================
+    int totalLate = lateN + lateG + lateV + lateF + lateE;
+    fout << "Late orders: " << totalLate
+        << " [Norm:" << lateN
+        << ", Veg:" << lateG
+        << ", VIP:" << lateV
+        << ", Fam:" << lateF
+        << ", Exp:" << lateE << "]\n\n";
 
-    //  per-cook statistics
-    auto printCookStats = [&fout](LinkedList<Cook*>& list, char typePrefix) {
-        Node<Cook*>* cur = list.getHead();
-        while (cur) {
-            Cook* c = cur->getItem();
+    // ================= Per Cook Statistics =================
+    auto printCookStats = [&fout](LinkedList<Cook*>& list, char prefix)
+        {
+            Node<Cook*>* cur = list.getHead();
+            while (cur) {
+                Cook* c = cur->getItem();
 
-            int busy = c->getBusyTime();
-            int idle = c->getIdleTime();
-            int br = c->getBreakTime() + c->getInjuryTime();
-            int denom = busy + idle + br;
-            double util = (denom > 0) ? (100.0 * busy / denom) : 0.0;
+                int busy = c->getBusyTime();
+                int idle = c->getIdleTime();
+                int rest = c->getBreakTime() + c->getInjuryTime();
+                int total = busy + idle + rest;
 
-            fout << "Cook " << typePrefix << c->getID()
-                << ": Orders [Norm:" << c->getHandledNormalOrders()
-                << ", Veg:" << c->getHandledVeganOrders()
-                << ", VIP:" << c->getHandledVIPOrders()
-                << "], Busy: " << busy
-                << ", Idle: " << idle
-                << ", Break/Injury: " << br << ",\n";
-            fout << "Utilization: " << util << "%\n";
+                double util = (total > 0) ? (100.0 * busy / total) : 0;
 
-            cur = cur->getNext();
-        }
+                fout << "Cook " << prefix << c->getID()
+                    << ": Orders [Norm:" << c->getHandledNormalOrders()
+                    << ", Veg:" << c->getHandledVeganOrders()
+                    << ", VIP:" << c->getHandledVIPOrders()
+                    << ", Fam:" << c->gethandlefamilyOrders()
+                    << ", Exp:" << c->gethandleexpressOrders()
+                    << "], Busy:" << busy
+                    << ", Idle:" << idle
+                    << ", Break/Injury:" << rest << "\n";
+
+                fout << "Utilization: " << util << "%\n";
+
+                cur = cur->getNext();
+            }
         };
 
     printCookStats(normalCooks, 'N');
     printCookStats(veganCooks, 'G');
     printCookStats(vipCooks, 'V');
-    printCookStats(familyCooks, 'F');   
-    printCookStats(expressCooks, 'E');   
+    printCookStats(familyCooks, 'F');
+    printCookStats(expressCooks, 'E');
 
     fout.close();
 }
+
+
+
 void Restaurant::Run() {
   
         pGUI->PrintMessage("Please enter input file name:");

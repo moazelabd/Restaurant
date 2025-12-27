@@ -13,7 +13,7 @@ cooks class
 Cook::Cook()
     : specialization(NORMAL), baseSpeed(0), currentSpeed(0), ordersBeforeBreak(0), breakDuration(0),
     status(AVAILABLE), handledNormalOrders(0), handledVeganOrders(0), handledVIPOrders(0),
-    busyTime(0), idleTime(0), breakTime(0), injuryTime(0) {
+    busyTime(0), idleTime(0), breakTime(0), injuryTime(0), handledexpressOrders(0),handledfamilyOrders(0) {
     ordersSinceLastBreak = 0;
     nextAvailableTime = 0;
     ID = 0;
@@ -32,6 +32,8 @@ void Cook::setStatus(CookStatus s) { status = s; }
 void Cook::setHandledNormalOrders(int n) { handledNormalOrders = n; }
 void Cook::setHandledVeganOrders(int v) { handledVeganOrders = v; }
 void Cook::setHandledVIPOrders(int vip) { handledVIPOrders = vip; }
+void Cook::setHandledfamilyOrders(int fam) { handledfamilyOrders = fam; }
+void Cook::setHandledexpressOrders(int exp) { handledexpressOrders = exp; }
 void Cook::setBusyTime(int t) { busyTime = t; }
 void Cook::setIdleTime(int t) { idleTime = t; }
 void Cook::setBreakTime(int t) { breakTime = t; }
@@ -60,6 +62,8 @@ CookStatus Cook::getStatus() const { return status; }
 int Cook::getHandledNormalOrders() const { return handledNormalOrders; }
 int Cook::getHandledVeganOrders() const { return handledVeganOrders; }
 int Cook::getHandledVIPOrders() const { return handledVIPOrders; }
+int Cook::gethandlefamilyOrders() const { return handledfamilyOrders; }
+int Cook::gethandleexpressOrders() const { return handledexpressOrders; }
 int Cook::getBusyTime() const { return busyTime; }
 int Cook::getIdleTime() const { return idleTime; }
 int Cook::getBreakTime() const { return breakTime; }

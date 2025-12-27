@@ -58,6 +58,7 @@ public:
     double computeDeadline(Order* o);
     void handleAutoPromotion();
     void writeOutputFile(const std::string& outName);
+
     void Run();
 };
 

@@ -24,6 +24,8 @@ private:
     int nextAvailableTime;
     int ordersSinceLastBreak;
     int ID;
+	int handledfamilyOrders;
+	int handledexpressOrders;
 
 
 
@@ -40,6 +42,8 @@ public:
     void setHandledNormalOrders(int n);
     void setHandledVeganOrders(int v);
     void setHandledVIPOrders(int vip);
+	void setHandledfamilyOrders(int fam);
+	void setHandledexpressOrders(int exp);
     void setBusyTime(int t);
     void setIdleTime(int t);
     void setBreakTime(int t);
@@ -63,6 +67,8 @@ public:
     int getHandledNormalOrders() const;
     int getHandledVeganOrders() const;
     int getHandledVIPOrders() const;
+	int gethandlefamilyOrders() const;
+	int gethandleexpressOrders() const;
     int getBusyTime() const;
     int getIdleTime() const;
     int getBreakTime() const;

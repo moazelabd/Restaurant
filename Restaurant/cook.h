@@ -57,6 +57,7 @@ public:
     void skipNextBreak();
     void resetOrdersSinceLastBreak();
 
+
     //getters
     OrderType getSpecialization() const;
     int getBreakDuration() const;

@@ -271,15 +271,33 @@ void Restaurant::LoadFile(const string& filename) {
 
 void Restaurant::FullSimulator() {
     CurrentTimeStep = 0;
-    int safetyMax = 100; // Stop after 100 steps no matter what
+   // int safetyMax = 100; // Stop after 100 steps no matter what
 
-    while (CurrentTimeStep < safetyMax && (
-        !events.isEmpty() || !normalOrders.isEmpty() ||
-        !veganOrders.isEmpty() || !vipOrders.isEmpty() ||
-        !familyOrders.isEmpty() || !expressOrders.isEmpty() ||
-        !inServiceOrders.isEmpty()))
+    while (
+       // CurrentTimeStep < safetyMax &&
+        (
+            !events.isEmpty() ||
+            !normalOrders.isEmpty() ||
+            !veganOrders.isEmpty() ||
+            !vipOrders.isEmpty() ||
+            !familyOrders.isEmpty() ||
+            !expressOrders.isEmpty() ||
+            !inServiceOrders.isEmpty()
+            )
+        )
     {
- 
+
+        if (CurrentTimeStep>=10) {
+            if (inServiceOrders.isEmpty() &&
+                normalOrders.isEmpty() &&
+                veganOrders.isEmpty() &&
+                vipOrders.isEmpty() &&
+                familyOrders.isEmpty() &&
+                expressOrders.isEmpty()) {
+                break;
+            }
+        }
+            
         // -------- update cooks (busy -> available, idle time) --------
         auto refreshCooks = [this](LinkedList<Cook*>& list) {
             Node<Cook*>* cur = list.getHead();
@@ -306,7 +324,7 @@ void Restaurant::FullSimulator() {
                     (c->getStatus() == AVAILABLE || c->getStatus() == BUSY)) {
 
                     double r = (double)rand() / RAND_MAX;
-                    if (r < injProb) {
+                    if (r <= injProb) {
                         c->markInjured(recoveryPeriod);
                         c->setNextAvailableTime(CurrentTimeStep + recoveryPeriod);
                       
@@ -335,6 +353,11 @@ void Restaurant::FullSimulator() {
         applyHealthEmergencies(familyCooks);
         applyHealthEmergencies(expressCooks);
 
+
+        // debug
+        cout << "DBG TS=" << CurrentTimeStep
+            << " Events=" << events.GetCount()  
+            << " eventsEmpty=" << events.isEmpty() << endl;
 
         // -------- handle events at this timestep --------
         Event* e;
@@ -401,6 +424,7 @@ void Restaurant::FullSimulator() {
                 }
                 normalOrders = tempQ;
             }
+			delete e;
         }
 
         // -------- update waiting time of all waiting orders --------
@@ -618,8 +642,7 @@ void Restaurant::FullSimulator() {
                 cook->setStatus(BUSY);
                 cook->setNextAvailableTime(CurrentTimeStep + st);
                 cook->setBusyTime(cook->getBusyTime() + st);
-                // you can add separate counters for family if needed
-
+                cook->setHandledfamilyOrders(cook->gethandlefamilyOrders() + 1);
                 inServiceOrders.InsertEnd(o);
             }
         }
@@ -648,8 +671,7 @@ void Restaurant::FullSimulator() {
                 cook->setStatus(BUSY);
                 cook->setNextAvailableTime(CurrentTimeStep + st);
                 cook->setBusyTime(cook->getBusyTime() + st);
-                // can add express counters per cook here
-
+                cook->setHandledexpressOrders(cook->gethandleexpressOrders() + 1);
                 inServiceOrders.InsertEnd(o);
             }
         }
@@ -685,20 +707,20 @@ void Restaurant::FullSimulator() {
         }
 
         // -------- move finished orders to finished list --------
-        {
-            LinkedList<Order*> remainingInService;
-            Order* inO;
-            while (inServiceOrders.DeleteFirst(inO)) {
-                if (inO->getFinishTime() <= CurrentTimeStep) {
-                    inO->setStatus(finished);
-                    finishedOrders.InsertEnd(inO);
-                }
-                else {
-                    remainingInService.InsertEnd(inO);
-                }
-            }
-            inServiceOrders = remainingInService;
-        }
+//        {
+//            LinkedList<Order*> remainingInService;
+//            Order* inO;
+//            while (inServiceOrders.DeleteFirst(inO)) {
+//                if (inO->getFinishTime() <= CurrentTimeStep) {
+//                    inO->setStatus(finished);
+//                    finishedOrders.InsertEnd(inO);
+//                }
+//                else {
+//                    remainingInService.InsertEnd(inO);
+//                }
+//            }
+//            inServiceOrders = remainingInService;
+//        }
 
         // -------- GUI drawing  --------
         cout << "DBG: counts - Normal=" << normalOrders.GetCount()
@@ -832,8 +854,9 @@ void Restaurant::FullSimulator() {
             }
         }
 
-
-        
+ 
+ 
+      
 
         CurrentTimeStep++;
     }
@@ -843,12 +866,28 @@ void Restaurant::FullSimulator() {
         << " G=" << totalVeganOrders
         << " V=" << totalVIPOrders
         << " | AutoPromoted=" << autoPromotedCount << endl;
-
+    pGUI = new GUI();
+    pGUI->ResetDrawingList();
+	// write output file
     writeOutputFile("output.txt");
+	// sucssesful end message
+    string msg = "==========\n";
+    msg += "    SIMULATION COMPLETED SUCCESSFULLY    \n";
+    msg += "==========\n\n";
+    msg += "Final Timestep: " + to_string(CurrentTimeStep) + "\n";
+    msg += "Total Finished Orders: " + to_string(finishedOrders.GetCount()) + "\n\n";
+    msg += "Normal: " + to_string(totalNormalOrders) + " | ";
+    msg += "Vegan: " + to_string(totalVeganOrders) + " | ";
+    msg += "VIP: " + to_string(totalVIPOrders) + "\n\n";
+    msg += "Output file 'output.txt' .\n\n";
+
+    pGUI->PrintMessage(msg);
+    pGUI->UpdateInterface();
+    pGUI->waitForClick();
+
+
+   
 }
-
-
-
 
 void Restaurant::insertCookSortedBySpeed(LinkedList<Cook*>& list, Cook* c) {
     
@@ -885,7 +924,7 @@ void Restaurant::insertCookSortedBySpeed(LinkedList<Cook*>& list, Cook* c) {
     }
 }
 
-Cook* Restaurant::getFastestAvailableCook(LinkedList<Cook*>& list, OrderType orderType) {
+Cook* Restaurant::getFastestAvailableCook(LinkedList<Cook*>& list, OrderType order) {
     Node<Cook*>* cur = list.getHead();
     while (cur) {
         Cook* c = cur->getItem();
@@ -1083,5 +1122,3 @@ void Restaurant::Run() {
     
     FullSimulator();
 }
-
-

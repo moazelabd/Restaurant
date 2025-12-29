@@ -80,10 +80,19 @@ void Restaurant::LoadFile(const string& filename) {
         Cook* c = new Cook();
         c->setID(normalID++);
         c->setSpecialization(NORMAL);
-        c->setBaseSpeed(speedNormal);
-        c->setCurrentSpeed(speedNormal);
+
+        // Variable speed: each cook gets slightly different speed
+        int cookSpeed = speedNormal + (i % 3) - 1;
+        if (cookSpeed < 1) cookSpeed = 1;
+        c->setBaseSpeed(cookSpeed);
+        c->setCurrentSpeed(cookSpeed);
+
         c->setOrdersBeforeBreak(ordersBeforeBreak);
-        c->setBreakDuration(breakNormal);
+
+        // Variable break: each cook gets slightly different break duration
+        int cookBreak = breakNormal + (i % 2);
+        c->setBreakDuration(cookBreak);
+
         c->setNextAvailableTime(0);
         insertCookSortedBySpeed(normalCooks, c);
     }
@@ -93,10 +102,19 @@ void Restaurant::LoadFile(const string& filename) {
         Cook* c = new Cook();
         c->setID(veganID++);
         c->setSpecialization(VEGAN);
-        c->setBaseSpeed(speedVegan);
-        c->setCurrentSpeed(speedVegan);
+
+        // Variable speed
+        int cookSpeed = speedVegan + (i % 3) - 1;
+        if (cookSpeed < 1) cookSpeed = 1;
+        c->setBaseSpeed(cookSpeed);
+        c->setCurrentSpeed(cookSpeed);
+
         c->setOrdersBeforeBreak(ordersBeforeBreak);
-        c->setBreakDuration(breakVegan);
+
+        // Variable break
+        int cookBreak = breakVegan + (i % 2);
+        c->setBreakDuration(cookBreak);
+
         c->setNextAvailableTime(0);
         insertCookSortedBySpeed(veganCooks, c);
     }
@@ -106,10 +124,19 @@ void Restaurant::LoadFile(const string& filename) {
         Cook* c = new Cook();
         c->setID(vipID++);
         c->setSpecialization(VIP);
-        c->setBaseSpeed(speedVIP);
-        c->setCurrentSpeed(speedVIP);
+
+        // Variable speed
+        int cookSpeed = speedVIP + (i % 3) - 1;
+        if (cookSpeed < 1) cookSpeed = 1;
+        c->setBaseSpeed(cookSpeed);
+        c->setCurrentSpeed(cookSpeed);
+
         c->setOrdersBeforeBreak(ordersBeforeBreak);
-        c->setBreakDuration(breakVIP);
+
+        // Variable break
+        int cookBreak = breakVIP + (i % 2);
+        c->setBreakDuration(cookBreak);
+
         c->setNextAvailableTime(0);
         insertCookSortedBySpeed(vipCooks, c);
     }
@@ -119,12 +146,20 @@ void Restaurant::LoadFile(const string& filename) {
         Cook* c = new Cook();
         c->setID(familyID++);
         c->setSpecialization(FAMILY);
-        c->setBaseSpeed(speedFamily);
-        c->setCurrentSpeed(speedFamily);
-        c->setOrdersBeforeBreak(ordersBeforeBreak);
-        c->setBreakDuration(breakFamily);
-        c->setNextAvailableTime(0);
 
+        // Variable speed
+        int cookSpeed = speedFamily + (i % 3) - 1;
+        if (cookSpeed < 1) cookSpeed = 1;
+        c->setBaseSpeed(cookSpeed);
+        c->setCurrentSpeed(cookSpeed);
+
+        c->setOrdersBeforeBreak(ordersBeforeBreak);
+
+        // Variable break
+        int cookBreak = breakFamily + (i % 2);
+        c->setBreakDuration(cookBreak);
+
+        c->setNextAvailableTime(0);
         insertCookSortedBySpeed(familyCooks, c);
     }
 
@@ -133,12 +168,20 @@ void Restaurant::LoadFile(const string& filename) {
         Cook* c = new Cook();
         c->setID(expressID++);
         c->setSpecialization(EXPRESS);
-        c->setBaseSpeed(speedExpress);
-        c->setCurrentSpeed(speedExpress);
-        c->setOrdersBeforeBreak(ordersBeforeBreak);
-        c->setBreakDuration(breakExpress);
-        c->setNextAvailableTime(0);
 
+        // Variable speed
+        int cookSpeed = speedExpress + (i % 3) - 1;
+        if (cookSpeed < 1) cookSpeed = 1;
+        c->setBaseSpeed(cookSpeed);
+        c->setCurrentSpeed(cookSpeed);
+
+        c->setOrdersBeforeBreak(ordersBeforeBreak);
+
+        // Variable break
+        int cookBreak = breakExpress + (i % 2);
+        c->setBreakDuration(cookBreak);
+
+        c->setNextAvailableTime(0);
         insertCookSortedBySpeed(expressCooks, c);
     }
 
@@ -158,8 +201,8 @@ void Restaurant::LoadFile(const string& filename) {
             if (orderType == "N") o->setOrderType(NORMAL);
             else if (orderType == "V") o->setOrderType(VIP);
             else if (orderType == "G") o->setOrderType(VEGAN);
-            else if (orderType == "F") o->setOrderType(FAMILY);   
-            else if (orderType == "E") o->setOrderType(EXPRESS);  
+            else if (orderType == "F") o->setOrderType(FAMILY);
+            else if (orderType == "E") o->setOrderType(EXPRESS);
 
             o->setOrderSize(size);
             o->setID(id);
@@ -190,6 +233,7 @@ void Restaurant::LoadFile(const string& filename) {
     cout << "File loaded successfully.\n";
     cout << "Events loaded: " << events.GetCount() << endl;
 }
+
 
 
 

@@ -27,14 +27,7 @@ The system uses **linked lists** and **queues** to manage the waiting list and o
 - **IDE:** Visual Studio
 - **Concepts Used:** Classes, Templates, Linked Lists, Queues, Object-Oriented Programming (OOP)
 
----
 
-## 👥 Team Members
-- **Leader:** Moaz Elabd  
-- **Team Member 1:** Mamdouh Nazmy  
-- **Team Member 2:** Mohamed Ashraf  
-
----
 
 ## 📌 How to Run
 1. Open the project in **Visual Studio**.
